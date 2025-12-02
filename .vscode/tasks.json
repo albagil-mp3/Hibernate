@@ -1,0 +1,38 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Build Project",
+			"type": "shell",
+			"command": "echo",
+			"args": ["Project build managed by VS Code Java Language Server with Maven dependencies"],
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"presentation": {
+				"echo": true,
+				"reveal": "silent",
+				"focus": false,
+				"panel": "shared",
+				"showReuseMessage": true,
+				"clear": false
+			},
+			"problemMatcher": []
+		},
+		{
+			"label": "Run Application",
+			"type": "shell",
+			"command": "echo",
+			"args": ["Use F5 or Run/Debug configuration to start the application. Make sure MySQL is running and configured."],
+			"group": "test",
+			"presentation": {
+				"echo": true,
+				"reveal": "always",
+				"focus": false,
+				"panel": "shared"
+			},
+			"problemMatcher": []
+		}
+	]
+}

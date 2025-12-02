@@ -1,0 +1,58 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\albag\\Documents\\2o\\ACCESO DATOS\\TEMA 3\\Hibernate\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\albag\\Documents\\2o\\ACCESO DATOS\\TEMA 3\\Hibernate\\src\\main\\java\\com\\billing\\main\\MainApplication.java||{3B902123-F8A7-4915-9F01-361F908088D0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\main\\java\\com\\billing\\main\\MainApplication.java||{3B902123-F8A7-4915-9F01-361F908088D0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\albag\\Documents\\2o\\ACCESO DATOS\\TEMA 3\\Hibernate\\DATABASE_SETUP.md||{EFC0BB08-EA7D-40C6-A696-C870411A895B}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:DATABASE_SETUP.md||{EFC0BB08-EA7D-40C6-A696-C870411A895B}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 1,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{aa2115a1-9712-457b-9047-dbb71ca2cdd2}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "MainApplication.java",
+              "DocumentMoniker": "C:\\Users\\albag\\Documents\\2o\\ACCESO DATOS\\TEMA 3\\Hibernate\\src\\main\\java\\com\\billing\\main\\MainApplication.java",
+              "RelativeDocumentMoniker": "src\\main\\java\\com\\billing\\main\\MainApplication.java",
+              "ToolTip": "C:\\Users\\albag\\Documents\\2o\\ACCESO DATOS\\TEMA 3\\Hibernate\\src\\main\\java\\com\\billing\\main\\MainApplication.java",
+              "RelativeToolTip": "src\\main\\java\\com\\billing\\main\\MainApplication.java",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001630|",
+              "WhenOpened": "2025-12-01T19:30:11.898Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "DATABASE_SETUP.md",
+              "DocumentMoniker": "C:\\Users\\albag\\Documents\\2o\\ACCESO DATOS\\TEMA 3\\Hibernate\\DATABASE_SETUP.md",
+              "RelativeDocumentMoniker": "DATABASE_SETUP.md",
+              "ToolTip": "C:\\Users\\albag\\Documents\\2o\\ACCESO DATOS\\TEMA 3\\Hibernate\\DATABASE_SETUP.md",
+              "RelativeToolTip": "DATABASE_SETUP.md",
+              "ViewState": "AgIAADwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001818|",
+              "WhenOpened": "2025-12-01T19:28:47.574Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

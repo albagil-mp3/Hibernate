@@ -1,0 +1,12 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Run MainApplication",
+            "request": "launch",
+            "mainClass": "com.billing.main.MainApplication",
+            "projectName": "hibernate-billing-system"
+        }
+    ]
+}
