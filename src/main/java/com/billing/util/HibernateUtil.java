@@ -7,7 +7,7 @@ import java.util.logging.Logger;
 /**
  * Hibernate utility class for managing SessionFactory
  * Follows Singleton pattern to ensure only one SessionFactory instance
- * Supports both MySQL and Oracle databases
+ * Configured for MySQL database
  */
 public class HibernateUtil {
     
@@ -15,27 +15,7 @@ public class HibernateUtil {
     private static SessionFactory sessionFactory;
     private static boolean initialized = false;
     private static Exception initializationError = null;
-    private static String currentDatabase = "mysql"; // Default to MySQL
     
-    /**
-     * Sets the database type to use (mysql or oracle)
-     * Must be called before first getSessionFactory() call
-     * @param databaseType "mysql" or "oracle"
-     */
-    public static void setDatabaseType(String databaseType) {
-        if (initialized) {
-            throw new IllegalStateException("Database type cannot be changed after SessionFactory initialization");
-        }
-        currentDatabase = databaseType;
-    }
-    
-    /**
-     * Gets the current database type
-     * @return current database type (mysql or oracle)
-     */
-    public static String getDatabaseType() {
-        return currentDatabase;
-    }
     
     /**
      * Initializes the SessionFactory lazily
@@ -61,7 +41,7 @@ public class HibernateUtil {
             logger.info("Initializing Hibernate SessionFactory with " + configFile + "...");
             // Create the SessionFactory from appropriate configuration file
             sessionFactory = new Configuration().configure(configFile).buildSessionFactory();
-            logger.info("Hibernate SessionFactory initialized successfully for " + currentDatabase + " database");
+            logger.info("Hibernate SessionFactory initialized successfully for MySQL database");
         } catch (Exception ex) {
             // Log the exception but don't throw it
             logger.severe("SessionFactory creation failed: " + ex.getMessage());
@@ -73,14 +53,11 @@ public class HibernateUtil {
     }
     
     /**
-     * Gets the appropriate configuration file based on current database setting
+     * Gets the appropriate configuration file for MySQL
      * @return the configuration file name
      */
     private static String getConfigurationFile() {
-        if ("oracle".equalsIgnoreCase(currentDatabase)) {
-            return "hibernate-oracle.cfg.xml";
-        }
-        return "hibernate.cfg.xml"; // Default MySQL configuration
+        return "hibernate.cfg.xml"; // MySQL configuration
     }
     
     /**

@@ -7,9 +7,9 @@
     <session-factory>
         <!-- Database connection settings -->
         <property name="hibernate.connection.driver_class">com.mysql.cj.jdbc.Driver</property>
-        <property name="hibernate.connection.url">jdbc:mysql://localhost:3306/facturacion?useSSL=false&amp;serverTimezone=UTC</property>
-        <property name="hibernate.connection.username">billing_user</property>
-        <property name="hibernate.connection.password">Toor1234@</property>
+        <property name="hibernate.connection.url">jdbc:mysql://localhost:3306/hibernate?useSSL=false&amp;serverTimezone=UTC</property>
+        <property name="hibernate.connection.username">usuario</property>
+        <property name="hibernate.connection.password">1234</property>
         
         <!-- JDBC connection pool settings -->
         <property name="hibernate.connection.pool_size">1</property>
@@ -23,6 +23,9 @@
         
         <!-- Drop and re-create the database schema on startup -->
         <property name="hibernate.hbm2ddl.auto">update</property>
+        
+        <!-- Disable bean validation to avoid javax/jakarta conflicts -->
+        <property name="javax.persistence.validation.mode">none</property>
         
         <!-- Names the annotated entity class -->
         <mapping class="com.billing.entity.Client"/>

@@ -1,7 +1,7 @@
 package com.billing.entity;
 
 import javax.persistence.*;
-import javax.validation.constraints.*;
+import jakarta.validation.constraints.*;
 import java.math.BigDecimal;
 
 /**

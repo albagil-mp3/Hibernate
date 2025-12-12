@@ -1,6 +1,6 @@
 # Hibernate Billing System - Client Management
 
-A comprehensive Java application for client management in billing systems, built with Hibernate ORM, MySQL/Oracle database support, and Java Swing GUI.
+A comprehensive Java application for client management in billing systems, built with Hibernate ORM, MySQL database support, and Java Swing GUI.
 
 ## 📋 Project Overview
 
@@ -10,8 +10,7 @@ This application provides a complete client management system for billing operat
 - **Advanced Search**: Search by name, DNI, phone, website
 - **Spanish Validations**: DNI validation, postal code validation by province
 - **Professional GUI**: Clean Swing interface with Calibri font
-- **Dual Database Support**: MySQL and Oracle databases with Hibernate ORM
-- **SQL*Plus & SQL Developer Compatible**: Full Oracle integration
+- **MySQL Database**: Full MySQL database integration with Hibernate ORM
 
 ## 🚀 Features
 
@@ -61,13 +60,13 @@ src/
 
 ## 🛠️ Technology Stack
 
-- **Java 11+**
+- **Java 21 LTS**
 - **Hibernate 5.6.15.Final**
-- **MySQL 8.0+ / Oracle 11g+**
+- **MySQL 8.0+**
 - **Maven** (Build Tool)
 - **Java Swing** (GUI Framework)
-- **Hibernate Validator** (Bean Validation)
-- **Oracle JDBC Driver 21.7.0.0** (for Oracle support)
+- **Jakarta Bean Validation** (Validation)
+- **MySQL Connector/J 8.2.0** (MySQL JDBC Driver)
 
 ## 📊 Database Schema
 
@@ -97,38 +96,29 @@ src/
 
 ### Prerequisites
 
-1. **Java 11 or higher**
-2. **MySQL 8.0+ OR Oracle 11g+**
+1. **Java 21 LTS**
+2. **MySQL 8.0+**
 3. **Maven 3.6+**
 
 ### Database Setup
 
-#### For MySQL
+#### MySQL Configuration
 1. **Install and start MySQL Server 8.0+**
 2. **Create database:**
 ```sql
-CREATE DATABASE facturacion;
+CREATE DATABASE hibernate;
+CREATE USER 'usuario'@'localhost' IDENTIFIED BY '1234';
+GRANT ALL PRIVILEGES ON hibernate.* TO 'usuario'@'localhost';
+FLUSH PRIVILEGES;
 ```
 
-For detailed MySQL setup, see [DATABASE_SETUP.md](DATABASE_SETUP.md)
-
-#### For Oracle
-1. **Install Oracle Database (Express Edition works fine)**
-2. **Create user and schema:**
-```sql
-CREATE USER facturacion IDENTIFIED BY facturacion;
-GRANT CONNECT, RESOURCE, DBA TO facturacion;
-```
-
-For detailed Oracle setup, see [ORACLE_DATABASE_SETUP.md](ORACLE_DATABASE_SETUP.md)
+For detailed MySQL setup and test data, see [DATABASE_SETUP.md](DATABASE_SETUP.md)
 
 ### Running the Application
 
 1. **Clone the repository**
-2. **Choose your database** - The application will prompt you to select MySQL or Oracle
-3. **Configure connection** - Update the appropriate configuration file:
-   - MySQL: `hibernate.cfg.xml`
-   - Oracle: `hibernate-oracle.cfg.xml`
+2. **Configure MySQL connection** - Update `hibernate.cfg.xml` with your MySQL credentials
+3. **Build and run** - The application will connect to MySQL automatically
 4. **Build and run**:
 ```bash
 mvn clean compile exec:java
@@ -137,9 +127,8 @@ mvn clean compile exec:java
 ## 🎯 Usage
 
 ### Database Selection
-- On startup, choose between MySQL and Oracle databases
-- The application automatically uses the appropriate configuration
-- Full compatibility with SQL*Plus and SQL Developer for Oracle
+- Application automatically connects to MySQL database
+- Configuration managed through `hibernate.cfg.xml`
 
 ### Main Window
 - Access client management through the menu

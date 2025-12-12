@@ -5,7 +5,13 @@ package com.billing.entity;
  */
 public enum PaymentMethod {
     CREDIT("Crèdit", "Credit"),
-    CASH("Contat", "Cash");
+    CASH("Contat", "Cash"),
+    TRANSFERENCIA_BANCARIA("Transferència Bancària", "Bank Transfer"),
+    DOMICILIACION_BANCARIA("Domiciliació Bancària", "Direct Debit"),
+    TARJETA_CREDITO("Targeta de Crèdit", "Credit Card"),
+    TARJETA_DEBITO("Targeta de Dèbit", "Debit Card"),
+    CHEQUE("Xec", "Check"),
+    EFECTIVO("Efectiu", "Cash");
     
     private final String catalanName;
     private final String englishName;
