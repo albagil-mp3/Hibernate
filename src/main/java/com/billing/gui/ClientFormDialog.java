@@ -287,7 +287,8 @@ public class ClientFormDialog extends JDialog {
         // Save button
         Component[] buttonPanelComponents = ((JPanel) getContentPane().getComponent(1)).getComponents();
         for (Component comp : buttonPanelComponents) {
-            if (comp instanceof JButton button) {
+            if (comp instanceof JButton) {
+                JButton button = (JButton) comp;
                 if ("Save".equals(button.getText())) {
                     button.addActionListener(e -> saveClient());
                 } else if ("Cancel".equals(button.getText())) {

@@ -32,10 +32,9 @@ public class MainWindow extends JFrame {
         if (!HibernateUtil.isInitialized()) {
             SwingUtilities.invokeLater(() -> {
                 JOptionPane.showMessageDialog(this,
-                    """
-                    Database is not available.
-                    The application will run in offline mode.
-                    Please check your MySQL connection and restart the application.""",
+                    "Database is not available.\n" +
+                    "The application will run in offline mode.\n" +
+                    "Please check your MySQL connection and restart the application.",
                     "Database Warning",
                     JOptionPane.WARNING_MESSAGE);
             });
@@ -166,18 +165,17 @@ public class MainWindow extends JFrame {
     
     private void showAbout() {
         JOptionPane.showMessageDialog(this,
-            """
-            Billing System - Client Management
-            Version 1.0
-            
-            Java Application using Hibernate ORM and MySQL
-            Developed for client management in billing systems
-            
-            Features:
-            • Create, update, and delete clients
-            • Search and filter clients
-            • Spanish DNI and postal code validation
-            • Professional GUI with Calibri font""",
+            "Billing System - Client Management\n" +
+            "Version 1.0\n" +
+            "\n" +
+            "Java Application using Hibernate ORM and MySQL\n" +
+            "Developed for client management in billing systems\n" +
+            "\n" +
+            "Features:\n" +
+            "• Create, update, and delete clients\n" +
+            "• Search and filter clients\n" +
+            "• Spanish DNI and postal code validation\n" +
+            "• Professional GUI with Calibri font",
             "About Billing System",
             JOptionPane.INFORMATION_MESSAGE);
     }

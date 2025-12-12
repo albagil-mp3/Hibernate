@@ -64,17 +64,14 @@ public class MainApplication {
         
         if (e.getMessage().contains("Communications link failure") || 
             e.getMessage().contains("Connection refused")) {
-            message += """
-                      Cannot connect to MySQL database.
-                      
-                      Please check:
-                      • MySQL server is running
-                      • Database 'hibernate' exists
-                      • Username and password are correct
-                      • MySQL is listening on port 3306
-                      
-                      The application will start in offline mode.
-                      Database features will not be available.""";
+            message += "Cannot connect to MySQL database.\n\n" +
+                      "Please check:\n" +
+                      "• MySQL server is running\n" +
+                      "• Database 'hibernate' exists\n" +
+                      "• Username and password are correct\n" +
+                      "• MySQL is listening on port 3306\n\n" +
+                      "The application will start in offline mode.\n" +
+                      "Database features will not be available.";
         } else {
             message += "Error: " + e.getMessage() + "\n\n" +
                       "Please check your database configuration.";
