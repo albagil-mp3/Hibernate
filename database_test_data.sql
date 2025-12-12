@@ -51,7 +51,7 @@ INSERT INTO clientes (
 -- Cliente 1: Empresa de tecnología
 (
     'Tech Solutions SL',
-    '12345678A',
+    '12345678D',
     'Calle Gran Via 123',
     'Madrid',
     'MADRID',
@@ -70,7 +70,7 @@ INSERT INTO clientes (
 -- Cliente 2: Restaurante
 (
     'Restaurante El Buen Gusto',
-    '23456789B',
+    '23456789Z',
     'Plaza Mayor 5',
     'Salamanca',
     'SALAMANCA',
@@ -89,7 +89,7 @@ INSERT INTO clientes (
 -- Cliente 3: Tienda de ropa
 (
     'Moda & Estilo CB',
-    '34567890C',
+    '34567890L',
     'Avenida Diagonal 456',
     'Barcelona',
     'BARCELONA',
@@ -108,7 +108,7 @@ INSERT INTO clientes (
 -- Cliente 4: Consultoría
 (
     'Consultores Asociados SA',
-    '45678901D',
+    '45678901R',
     'Calle Colón 789',
     'Valencia',
     'VALENCIA',
@@ -127,7 +127,7 @@ INSERT INTO clientes (
 -- Cliente 5: Panadería local
 (
     'Panadería San Miguel',
-    '56789012E',
+    '56789012Y',
     'Calle del Pan 12',
     'Sevilla',
     'SEVILLA',
@@ -146,7 +146,7 @@ INSERT INTO clientes (
 -- Cliente 6: Empresa de construcción
 (
     'Construcciones Gómez SL',
-    '67890123F',
+    '67890123B',
     'Polígono Industrial Norte 34',
     'Bilbao',
     'VIZCAYA',
@@ -165,7 +165,7 @@ INSERT INTO clientes (
 -- Cliente 7: Farmacia
 (
     'Farmacia Central',
-    '78901234G',
+    '78901234Q',
     'Plaza de la Constitución 1',
     'Granada',
     'GRANADA',
@@ -184,7 +184,7 @@ INSERT INTO clientes (
 -- Cliente 8: Empresa de limpieza
 (
     'Limpiezas Profesionales Norte',
-    '89012345H',
+    '89012345K',
     'Calle Industria 67',
     'Zaragoza',
     'ZARAGOZA',
@@ -203,7 +203,7 @@ INSERT INTO clientes (
 -- Cliente 9: Autoescuela
 (
     'Autoescuela Conducir Bien',
-    '90123456I',
+    '90123456A',
     'Avenida de la Paz 89',
     'Murcia',
     'MURCIA',
@@ -241,7 +241,7 @@ INSERT INTO clientes (
 -- Cliente 11: Inactivo para pruebas
 (
     'Empresa Cerrada SL',
-    '11111111K',
+    '11111111V',
     'Calle Cerrada 1',
     'Toledo',
     'TOLEDO',
