@@ -40,6 +40,8 @@ public class MainWindow extends JFrame {
             });
         }
     }
+
+
     
     private void initializeComponents() {
         setTitle("Billing System - Client Management");
@@ -142,14 +144,14 @@ public class MainWindow extends JFrame {
     
     private void configureWindow() {
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-        setSize(1000, 700);
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
         setMinimumSize(new Dimension(800, 600));
-        setLocationRelativeTo(null); // Center on screen
+        setLocationRelativeTo(null);
         
-        // Set icon (placeholder - can be replaced with actual icon)
+        // Set window icon
         try {
-            // ImageIcon icon = new ImageIcon(getClass().getResource("/icon.png"));
-            // setIconImage(icon.getImage());
+            ImageIcon icon = new ImageIcon(getClass().getResource("/icon.png"));
+            setIconImage(icon.getImage());
         } catch (Exception e) {
             // Icon not found, continue without icon
         }

@@ -23,7 +23,11 @@ public class ClientDetailsDialog extends JDialog {
     }
     
     private void initializeComponents() {
-        // Set the dialog properties
+    // Set the dialog properties
+    setTitle("Client Details - " + (client.getName() != null ? client.getName() : "Unknown"));
+    setModal(true);
+    setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+    setResizable(true);
     }
     
     private void setupLayout() {

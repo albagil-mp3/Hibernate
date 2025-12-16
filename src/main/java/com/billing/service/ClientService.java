@@ -4,6 +4,7 @@ import com.billing.dao.ClientDAO;
 import com.billing.dao.ClientDAOImpl;
 import com.billing.entity.Client;
 import com.billing.entity.SpanishProvince;
+import com.billing.util.HibernateUtil;
 import com.billing.util.SpanishValidationUtil;
 
 import jakarta.validation.ConstraintViolation;
@@ -23,14 +24,18 @@ public class ClientService {
     private static final Logger logger = Logger.getLogger(ClientService.class.getName());
     private final ClientDAO clientDAO;
     private final Validator validator;
+    private final boolean hibernateAvailable;
     
     public ClientService() {
         this.clientDAO = new ClientDAOImpl();
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         this.validator = factory.getValidator();
         
-        // TODO: Implement Hibernate availability check if needed
-        // logger.warning("Database is not available. Some features will be disabled.");
+        // Check Hibernate availability and log status
+        this.hibernateAvailable = HibernateUtil.isInitialized();
+        if (!hibernateAvailable) {
+            logger.warning("Hibernate not initialized. Running in offline mode; database operations may be limited.");
+        }
     }
     
     /**
