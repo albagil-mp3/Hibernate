@@ -48,274 +48,211 @@ INSERT INTO clientes (
     forma_pagament, limit_credit, numero_conta_bancari, actiu, observacions
 ) VALUES
 
--- Cliente 1: Empresa de tecnología
-(
-    'Tech Solutions SL',
-    '12345678D',
-    'Calle Gran Via 123',
-    'Madrid',
-    'MADRID',
-    '28013',
-    '914567890',
-    '666123456',
-    'info@techsolutions.es',
-    'www.techsolutions.es',
-    'TRANSFERENCIA_BANCARIA',
-    50000.00,
-    'ES1234567890123456789012',
-    TRUE,
-    'Cliente preferente. Descuento del 10% en servicios de consultoría.'
-),
+-- Cliente 1
+ (
+     'Juan García López',
+     '12345678Z',
+     'Calle Gran Vía 123',
+     'Madrid',
+     'MADRID',
+     '28013',
+     '914567890',
+     '666123456',
+     'juan.garcia@example.com',
+     NULL,
+     'TRANSFERENCIA_BANCARIA',
+     5000.00,
+     'ES1234567890123456789012',
+     TRUE,
+     'Cliente particular, contacto por correo.'
+ ),
 
--- Cliente 2: Restaurante
-(
-    'Restaurante El Buen Gusto',
-    '23456789Z',
-    'Plaza Mayor 5',
-    'Salamanca',
-    'SALAMANCA',
-    '37002',
-    '923456789',
-    '677234567',
-    'reservas@elbuengusto.es',
-    'www.elbuengusto.es',
-    'DOMICILIACION_BANCARIA',
-    15000.00,
-    'ES2345678901234567890123',
-    TRUE,
-    'Facturación mensual. Incluye servicios de catering para eventos.'
-),
+-- Cliente 2
+ (
+     'María Fernández Ruiz',
+     '23456789D',
+     'Plaza Mayor 5',
+     'Salamanca',
+     'SALAMANCA',
+     '37002',
+     '923456789',
+     '677234567',
+     'maria.fernandez@example.com',
+     NULL,
+     'DOMICILIACION_BANCARIA',
+     1500.00,
+     'ES2345678901234567890123',
+     TRUE,
+     'Pago mensual mediante domiciliación.'
+ ),
 
--- Cliente 3: Tienda de ropa
-(
-    'Moda & Estilo CB',
-    '34567890L',
-    'Avenida Diagonal 456',
-    'Barcelona',
-    'BARCELONA',
-    '08029',
-    '934567890',
-    '688345678',
-    'ventas@modaestilo.es',
-    NULL,
-    'TARJETA_CREDITO',
-    25000.00,
-    'ES3456789012345678901234',
-    TRUE,
-    'Cliente desde 2020. Pedidos frecuentes en temporada alta.'
-),
+-- Cliente 3
+ (
+     'Carlos Martínez Pérez',
+     '34567890V',
+     'Avenida Diagonal 456',
+     'Barcelona',
+     'BARCELONA',
+     '08029',
+     '934567890',
+     '688345678',
+     'carlos.martinez@example.com',
+     NULL,
+     'TARJETA_CREDITO',
+     2500.00,
+     'ES3456789012345678901234',
+     TRUE,
+     'Cliente con pagos con tarjeta.'
+ ),
 
--- Cliente 4: Consultoría
-(
-    'Consultores Asociados SA',
-    '45678901R',
-    'Calle Colón 789',
-    'Valencia',
-    'VALENCIA',
-    '46004',
-    '963456789',
-    '699456789',
-    'contacto@consultores.es',
-    'www.consultoresasociados.es',
-    'TRANSFERENCIA_BANCARIA',
-    75000.00,
-    'ES4567890123456789012345',
-    TRUE,
-    'Multinacional con oficinas en España. Facturación trimestral.'
-),
+-- Cliente 4
+ (
+     'Lucía Gómez Sánchez',
+     '45678901G',
+     'Calle Colón 789',
+     'Valencia',
+     'VALENCIA',
+     '46004',
+     '963456789',
+     '699456789',
+     'lucia.gomez@example.com',
+     NULL,
+     'TRANSFERENCIA_BANCARIA',
+     7500.00,
+     'ES4567890123456789012345',
+     TRUE,
+     'Cliente habitual, facturación trimestral.'
+ ),
 
--- Cliente 5: Panadería local
-(
-    'Panadería San Miguel',
-    '56789012Y',
-    'Calle del Pan 12',
-    'Sevilla',
-    'SEVILLA',
-    '41001',
-    '954567890',
-    '610567890',
-    'pedidos@panaderiasanmiguel.es',
-    NULL,
-    'EFECTIVO',
-    5000.00,
-    NULL,
-    TRUE,
-    'Negocio familiar. Pago al contado. Pedidos semanales.'
-),
+-- Cliente 5
+ (
+     'Ana Ruiz Torres',
+     '56789012B',
+     'Calle del Pan 12',
+     'Sevilla',
+     'SEVILLA',
+     '41001',
+     '954567890',
+     '610567890',
+     'ana.ruiz@example.com',
+     NULL,
+     'EFECTIVO',
+     500.00,
+     NULL,
+     TRUE,
+     'Cliente particular, pagos al contado.'
+ ),
 
--- Cliente 6: Empresa de construcción
-(
-    'Construcciones Gómez SL',
-    '67890123B',
-    'Polígono Industrial Norte 34',
-    'Bilbao',
-    'VIZCAYA',
-    '48940',
-    '944567890',
-    '621678901',
-    'obras@construccionesgomez.es',
-    'www.construccionesgomez.es',
-    'DOMICILIACION_BANCARIA',
-    100000.00,
-    'ES5678901234567890123456',
-    TRUE,
-    'Especialistas en obra pública. Proyectos de larga duración.'
-),
+-- Cliente 6
+ (
+     'Miguel Ángel Gómez',
+     '67890123B',
+     'Polígono Industrial Norte 34',
+     'Bilbao',
+     'VIZCAYA',
+     '48940',
+     '944567890',
+     '621678901',
+     'miguel.gomez@example.com',
+     NULL,
+     'DOMICILIACION_BANCARIA',
+     10000.00,
+     'ES5678901234567890123456',
+     TRUE,
+     'Cliente con domiciliación y crédito aprobado.'
+ ),
 
--- Cliente 7: Farmacia
-(
-    'Farmacia Central',
-    '78901234Q',
-    'Plaza de la Constitución 1',
-    'Granada',
-    'GRANADA',
-    '18001',
-    '958567890',
-    '632789012',
-    'info@farmaciacentral.es',
-    NULL,
-    'TRANSFERENCIA_BANCARIA',
-    20000.00,
-    'ES6789012345678901234567',
-    TRUE,
-    'Farmacia 24h. Servicios especializados en medicamentos oncológicos.'
-),
+-- Cliente 7
+ (
+     'Sofía Navarro Ruiz',
+     '78901234X',
+     'Plaza de la Constitución 1',
+     'Granada',
+     'GRANADA',
+     '18001',
+     '958567890',
+     '632789012',
+     'sofia.navarro@example.com',
+     NULL,
+     'TRANSFERENCIA_BANCARIA',
+     2000.00,
+     'ES6789012345678901234567',
+     TRUE,
+     'Cliente particular con pedidos regulares.'
+ ),
 
--- Cliente 8: Empresa de limpieza
-(
-    'Limpiezas Profesionales Norte',
-    '89012345K',
-    'Calle Industria 67',
-    'Zaragoza',
-    'ZARAGOZA',
-    '50013',
-    '976567890',
-    '643890123',
-    'servicios@limpiezasnorte.es',
-    'www.limpiezasnorte.es',
-    'DOMICILIACION_BANCARIA',
-    30000.00,
-    'ES7890123456789012345678',
-    TRUE,
-    'Contratos anuales con empresas. Servicio de limpieza industrial.'
-),
+-- Cliente 8
+ (
+     'Óscar Ruiz Herrera',
+     '89012345E',
+     'Calle Industria 67',
+     'Zaragoza',
+     'ZARAGOZA',
+     '50013',
+     '976567890',
+     '643890123',
+     'oscar.ruiz@example.com',
+     NULL,
+     'DOMICILIACION_BANCARIA',
+     3000.00,
+     'ES7890123456789012345678',
+     TRUE,
+     'Cliente con domiciliación bancaria.'
+ ),
 
--- Cliente 9: Autoescuela
-(
-    'Autoescuela Conducir Bien',
-    '90123456A',
-    'Avenida de la Paz 89',
-    'Murcia',
-    'MURCIA',
-    '30001',
-    '968567890',
-    '654901234',
-    'matriculas@conducirbien.es',
-    'www.autoescuelaconducirbien.es',
-    'TARJETA_CREDITO',
-    10000.00,
-    'ES8901234567890123456789',
-    TRUE,
-    'Cursos intensivos y regulares. Descuento para estudiantes.'
-),
+-- Cliente 9
+ (
+     'Elena Castillo Moreno',
+     '90123456A',
+     'Avenida de la Paz 89',
+     'Murcia',
+     'MURCIA',
+     '30001',
+     '968567890',
+     '654901234',
+     'elena.castillo@example.com',
+     NULL,
+     'TARJETA_CREDITO',
+     1000.00,
+     'ES8901234567890123456789',
+     TRUE,
+     'Pago con tarjeta; cliente estudiante.'
+ ),
 
--- Cliente 10: Librería
-(
-    'Librería El Saber',
-    '01234567J',
-    'Calle de los Libros 23',
-    'Valladolid',
-    'VALLADOLID',
-    '47001',
-    '983567890',
-    '665012345',
-    'pedidos@libreriasaber.es',
-    NULL,
-    'CHEQUE',
-    8000.00,
-    'ES9012345678901234567890',
-    TRUE,
-    'Especializada en libros técnicos y universitarios. Cliente desde 2018.'
-),
+-- Cliente 10
+ (
+     'Pablo Santos Díaz',
+     '01234567L',
+     'Calle de los Libros 23',
+     'Valladolid',
+     'VALLADOLID',
+     '47001',
+     '983567890',
+     '665012345',
+     'pablo.santos@example.com',
+     NULL,
+     'CHEQUE',
+     800.00,
+     'ES9012345678901234567890',
+     TRUE,
+     'Cliente particular comprador de libros.'
+ ),
 
--- Cliente 11: Inactivo para pruebas
-(
-    'Empresa Cerrada SL',
-    '11111111V',
-    'Calle Cerrada 1',
-    'Toledo',
-    'TOLEDO',
-    '45001',
-    '925111111',
-    '611111111',
-    'info@cerrada.es',
-    NULL,
-    'EFECTIVO',
-    0.00,
-    NULL,
-    FALSE,
-    'Cliente dado de baja por cierre de negocio.'
-);
-
--- ===============================================
--- VERIFICACIONES
--- ===============================================
-
--- Mostrar resumen de datos insertados
-SELECT 
-    'Total de clientes' as Descripcion,
-    COUNT(*) as Cantidad
-FROM clientes
-
-UNION ALL
-
-SELECT 
-    'Clientes activos' as Descripcion,
-    COUNT(*) as Cantidad
-FROM clientes 
-WHERE actiu = TRUE
-
-UNION ALL
-
-SELECT 
-    'Clientes inactivos' as Descripcion,
-    COUNT(*) as Cantidad
-FROM clientes 
-WHERE actiu = FALSE;
-
--- Mostrar distribución por provincia
-SELECT 
-    provincia,
-    COUNT(*) as total_clientes
-FROM clientes 
-GROUP BY provincia 
-ORDER BY total_clientes DESC;
-
--- Mostrar distribución por forma de pago
-SELECT 
-    forma_pagament,
-    COUNT(*) as total_clientes,
-    ROUND(AVG(limit_credit), 2) as limite_promedio
-FROM clientes 
-WHERE actiu = TRUE
-GROUP BY forma_pagament 
-ORDER BY total_clientes DESC;
-
--- ===============================================
--- COMANDOS ÚTILES PARA PRUEBAS
--- ===============================================
-
--- Para conectar desde la aplicación, usar estos datos:
--- Host: localhost
--- Puerto: 3306
--- Base de datos: hibernate
--- Usuario: usuario
--- Contraseña: 1234
-
--- NOTAS:
--- 1. Todos los DNIs son válidos según el algoritmo español
--- 2. Los IBANs son formato válido pero ficticios
--- 3. Los teléfonos siguen el formato español
--- 4. Hay ejemplos de todas las formas de pago
--- 5. Hay un cliente inactivo para probar filtros
--- 6. Los límites de crédito varían según el tipo de negocio
+-- Cliente 11: Inactivo 
+ (
+     'Laura Molina Peña',
+     '11111111H',
+     'Calle Cerrada 1',
+     'Toledo',
+     'TOLEDO',
+     '45001',
+     '925111111',
+     '611111111',
+     'laura.molina@example.com',
+     NULL,
+     'EFECTIVO',
+     0.00,
+     NULL,
+     FALSE,
+     'Cliente dado de baja (inactivo).' 
+ );

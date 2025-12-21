@@ -1,5 +1,9 @@
 package com.billing.service;
 
+import java.util.List;
+import java.util.Set;
+import java.util.logging.Logger;
+
 import com.billing.dao.ClientDAO;
 import com.billing.dao.ClientDAOImpl;
 import com.billing.entity.Client;
@@ -11,9 +15,6 @@ import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
-import java.util.List;
-import java.util.Set;
-import java.util.logging.Logger;
 
 /**
  * Service layer for Client operations
@@ -67,7 +68,7 @@ public class ClientService {
         // Format DNI properly
         client.setDni(SpanishValidationUtil.formatDNI(client.getDni()));
         
-        logger.info("Creating new client: " + client.getName());
+        logger.info(() -> "Creating new client: " + client.getName());
         return clientDAO.save(client);
     }
     
@@ -110,7 +111,7 @@ public class ClientService {
         // Format DNI properly
         client.setDni(SpanishValidationUtil.formatDNI(client.getDni()));
         
-        logger.info("Updating client: " + client.getName());
+        logger.info(() -> "Updating client: " + client.getName());
         return clientDAO.update(client);
     }
     
@@ -125,7 +126,7 @@ public class ClientService {
             throw new IllegalArgumentException("Client with ID " + id + " not found");
         }
         
-        logger.info("Deleting client: " + client.getName());
+        logger.info(() -> "Deleting client: " + client.getName());
         clientDAO.delete(client);
     }
     

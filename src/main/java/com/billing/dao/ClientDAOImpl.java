@@ -1,15 +1,16 @@
 package com.billing.dao;
 
-import com.billing.entity.Client;
-import com.billing.util.HibernateUtil;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.query.Query;
 
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import com.billing.entity.Client;
+import com.billing.util.HibernateUtil;
 
 /**
  * Implementation of ClientDAO using Hibernate
@@ -28,13 +29,16 @@ public class ClientDAOImpl implements ClientDAO {
         if (!HibernateUtil.isInitialized()) {
             throw new RuntimeException("Database is not available. Please check your MySQL connection.");
         }
+        if (sessionFactory == null || sessionFactory.isClosed()) {
+            throw new RuntimeException("Hibernate SessionFactory is closed or unavailable. Restart the application to reinitialize the database connection.");
+        }
         
         Transaction transaction = null;
         try (Session session = sessionFactory.openSession()) {
             transaction = session.beginTransaction();
             session.save(client);
             transaction.commit();
-            logger.info("Client saved successfully with ID: " + client.getId());
+            logger.info("Client saved successfully with ID: {0}");
             return client;
         } catch (Exception e) {
             if (transaction != null) {
@@ -73,7 +77,7 @@ public class ClientDAOImpl implements ClientDAO {
             transaction = session.beginTransaction();
             session.update(client);
             transaction.commit();
-            logger.info("Client updated successfully with ID: " + client.getId());
+            logger.info("Client updated successfully with ID: {0}");
             return client;
         } catch (Exception e) {
             if (transaction != null) {
@@ -91,7 +95,7 @@ public class ClientDAOImpl implements ClientDAO {
             transaction = session.beginTransaction();
             session.delete(client);
             transaction.commit();
-            logger.info("Client deleted successfully with ID: " + client.getId());
+            logger.info(() -> "Client deleted successfully with ID: " + client.getId());
         } catch (Exception e) {
             if (transaction != null) {
                 transaction.rollback();

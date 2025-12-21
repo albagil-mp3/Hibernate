@@ -1,15 +1,38 @@
 package com.billing.gui;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Cursor;
+import java.awt.Dialog;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.Frame;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.math.BigDecimal;
+import java.util.List;
+
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
+import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableModel;
+
 import com.billing.entity.Client;
 import com.billing.service.ClientService;
 
-import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableRowSorter;
-import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.util.List;
 
 /**
  * Panel for managing client operations (CRUD)
@@ -17,12 +40,11 @@ import java.util.List;
  */
 public class ClientManagementPanel extends JPanel {
     
-    private ClientService clientService;
+    private final ClientService clientService;
     private JTable clientTable;
     private DefaultTableModel tableModel;
     private JTextField searchField;
     private JComboBox<String> sortComboBox;
-    private TableRowSorter<DefaultTableModel> tableSorter;
     
     // Button references
     private JButton searchButton;
@@ -51,31 +73,109 @@ public class ClientManagementPanel extends JPanel {
     private void initializeComponents() {
         // Search components
         searchField = new JTextField(20);
-        searchField.setFont(new Font("Calibri", Font.PLAIN, 12));
+        searchField.setFont(UIConstants.UI_FONT);
         
         String[] sortOptions = {"Sort by ID", "Sort by DNI", "Sort by Name"};
         sortComboBox = new JComboBox<>(sortOptions);
-        sortComboBox.setFont(new Font("Calibri", Font.PLAIN, 12));
+        sortComboBox.setFont(UIConstants.UI_FONT);
+        sortComboBox.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         
-        // Table
+        // Initialize Add and Refresh buttons using module palette
+        addButton = UIConstants.createPrimaryButton("ADD CLIENT",
+            UIConstants.loadIcon("/icons/add.png", 16));
+        addButton.setBackground(UIConstants.MODULE_CLIENTS_ICON);
+        addButton.setForeground(Color.WHITE);
+
+        refreshButton = UIConstants.createSecondaryButton("REFRESH",
+            UIConstants.loadIcon("/icons/refresh.png", 16));
+        refreshButton.setBorder(null);
+        refreshButton.setForeground(Color.WHITE);
+        
+        // Table model
         tableModel = new DefaultTableModel(columnNames, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
                 return false; // Make table read-only
             }
+            @Override
+            public Class<?> getColumnClass(int columnIndex) {
+                // Ensure proper class types for each column
+                return switch (columnIndex) {
+                    case 0 -> Integer.class;        // ID
+                    case 12 -> BigDecimal.class;    // Credit Limit
+                    case 13 -> String.class;        // Active (Yes/No)
+                    default -> String.class;        // All other columns are String
+                }; 
+            }
         };
         
         clientTable = new JTable(tableModel);
-        clientTable.setFont(new Font("Calibri", Font.PLAIN, 12));
-        clientTable.getTableHeader().setFont(new Font("Calibri", Font.BOLD, 12));
+        clientTable.setFont(UIConstants.UI_FONT);
+        clientTable.getTableHeader().setFont(UIConstants.UI_FONT.deriveFont(Font.BOLD));
+        clientTable.getTableHeader().setOpaque(true);
         clientTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        clientTable.setRowHeight(25);
+        clientTable.setRowHeight(28);
+        clientTable.getTableHeader().setReorderingAllowed(false);
+        clientTable.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        clientTable.getTableHeader().setCursor(Cursor.getDefaultCursor()); // Regular cursor for header
+        
+        // Custom header renderer without sort arrows
+        DefaultTableCellRenderer headerRenderer = new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value,
+                                                           boolean isSelected, boolean hasFocus,
+                                                           int row, int column) {
+                JLabel label = (JLabel) super.getTableCellRendererComponent(
+                    table, value, isSelected, hasFocus, row, column);
+                label.setHorizontalAlignment(SwingConstants.CENTER);
+                label.setFont(UIConstants.UI_FONT.deriveFont(Font.BOLD));
+                label.setOpaque(true);
+                label.setBackground(UIConstants.MODULE_CLIENTS_TEXT);
+                label.setForeground(Color.WHITE);
+                label.setBorder(BorderFactory.createEmptyBorder(6, 8, 6, 8));
+                return label;
+            }
+        };
+        clientTable.getTableHeader().setDefaultRenderer(headerRenderer);
+        
+        // Disable table sorting completely
+        clientTable.setAutoCreateRowSorter(false);
         
         // Set column widths
         setColumnWidths();
         
-        tableSorter = new TableRowSorter<>(tableModel);
-        clientTable.setRowSorter(tableSorter);
+        // Alternating row colors and selection styling
+        DefaultTableCellRenderer unifiedRenderer = new DefaultTableCellRenderer() {
+            private final Color EVEN = Color.WHITE;
+            private final Color ODD = UIConstants.MODULE_CLIENTS_BG;
+            
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
+                                                          boolean hasFocus, int row, int column) {
+                JLabel c = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                if (isSelected) {
+                    c.setBackground(UIConstants.MODULE_CLIENTS_ICON);
+                    c.setForeground(Color.WHITE);
+                } else {
+                    c.setBackground(row % 2 == 0 ? EVEN : ODD);
+                    c.setForeground(new Color(0x212121));
+                }
+                return c;
+            }
+        };
+        
+        // Apply same renderer for all column types
+        clientTable.setDefaultRenderer(Object.class, unifiedRenderer);
+        clientTable.setDefaultRenderer(Number.class, unifiedRenderer);
+        clientTable.setDefaultRenderer(Integer.class, unifiedRenderer);
+        clientTable.setDefaultRenderer(BigDecimal.class, unifiedRenderer);
+        
+        // Buttons (top search buttons)
+        searchButton = UIConstants.createSecondaryButton("SEARCH",
+            UIConstants.loadIcon("/icons/search.png", 16));
+
+        clearButton = UIConstants.createSecondaryButton("CLEAR",
+            UIConstants.loadIcon("/icons/clear.png", 16));
     }
     
     private void setColumnWidths() {
@@ -89,6 +189,7 @@ public class ClientManagementPanel extends JPanel {
     private void setupLayout() {
         setLayout(new BorderLayout());
         setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        setBackground(UIConstants.MODULE_CLIENTS_BG);
         
         // Top panel with search and controls (includes title)
         JPanel topPanel = createTopPanel();
@@ -97,6 +198,8 @@ public class ClientManagementPanel extends JPanel {
         // Center panel with table
         JScrollPane tableScrollPane = new JScrollPane(clientTable);
         tableScrollPane.setPreferredSize(new Dimension(0, 400));
+        // enhanced, more dynamic mouse-wheel scrolling via UIConstants
+        UIConstants.enhanceScroll(tableScrollPane);
         add(tableScrollPane, BorderLayout.CENTER);
         
         // Bottom panel with buttons
@@ -106,35 +209,54 @@ public class ClientManagementPanel extends JPanel {
     
     private JPanel createTopPanel() {
         JPanel topPanel = new JPanel(new BorderLayout());
+        topPanel.setBackground(UIConstants.MODULE_CLIENTS_BG);
         
-        // Title
+        // Header bar title
+        JPanel headerPanel = new JPanel(new BorderLayout());
+        headerPanel.setPreferredSize(new Dimension(0, 80));
+        headerPanel.setBackground(UIConstants.MODULE_CLIENTS_TEXT);
+
         JLabel titleLabel = new JLabel("Client Management", SwingConstants.CENTER);
-        titleLabel.setFont(new Font("Calibri", Font.BOLD, 18));
-        titleLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 15, 0));
-        topPanel.add(titleLabel, BorderLayout.NORTH);
+        titleLabel.setFont(UIConstants.TITLE_FONT.deriveFont(24f));
+        titleLabel.setForeground(Color.WHITE);
+        titleLabel.setBorder(BorderFactory.createEmptyBorder(12, 0, 12, 0));
+
+        headerPanel.add(titleLabel, BorderLayout.CENTER);
         
-        // Search panel
-        JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        searchPanel.setBorder(BorderFactory.createEmptyBorder(5, 0, 10, 0));
+        topPanel.add(headerPanel, BorderLayout.NORTH);
+        
+        // Search and controls panel - search on left, buttons on right
+        JPanel controlsPanel = new JPanel(new BorderLayout());
+        controlsPanel.setBorder(BorderFactory.createEmptyBorder(5, 0, 10, 0));
+        controlsPanel.setOpaque(false);
+        
+        // Left side: Search and Sort
+        JPanel leftPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        leftPanel.setOpaque(false);
         
         JLabel searchLabel = new JLabel("Search:");
-        searchLabel.setFont(new Font("Calibri", Font.PLAIN, 12));
+        searchLabel.setFont(UIConstants.UI_FONT);
+        searchLabel.setForeground(new Color(0x212121));
         
-        searchButton = new JButton("Search");
-        searchButton.setFont(new Font("Calibri", Font.PLAIN, 12));
+        leftPanel.add(searchLabel);
+        leftPanel.add(searchField);
+        leftPanel.add(searchButton);
+        leftPanel.add(clearButton);
+        leftPanel.add(Box.createHorizontalStrut(20));
+        leftPanel.add(new JLabel("Sort:"));
+        leftPanel.add(sortComboBox);
         
-        clearButton = new JButton("Clear");
-        clearButton.setFont(new Font("Calibri", Font.PLAIN, 12));
+        // Right side: Add Client and Refresh
+        JPanel rightPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        rightPanel.setOpaque(false);
         
-        searchPanel.add(searchLabel);
-        searchPanel.add(searchField);
-        searchPanel.add(searchButton);
-        searchPanel.add(clearButton);
-        searchPanel.add(Box.createHorizontalStrut(20));
-        searchPanel.add(new JLabel("Sort:"));
-        searchPanel.add(sortComboBox);
+        rightPanel.add(addButton);
+        rightPanel.add(refreshButton);
         
-        topPanel.add(searchPanel, BorderLayout.CENTER);
+        controlsPanel.add(leftPanel, BorderLayout.WEST);
+        controlsPanel.add(rightPanel, BorderLayout.EAST);
+        
+        topPanel.add(controlsPanel, BorderLayout.CENTER);
         
         return topPanel;
     }
@@ -142,26 +264,18 @@ public class ClientManagementPanel extends JPanel {
     private JPanel createBottomPanel() {
         JPanel bottomPanel = new JPanel(new FlowLayout());
         bottomPanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 0));
+        bottomPanel.setBackground(UIConstants.MODULE_CLIENTS_BG);
         
-        addButton = new JButton("Add Client");
-        editButton = new JButton("Edit Client");
-        deleteButton = new JButton("Delete Client");
-        viewButton = new JButton("View Details");
-        refreshButton = new JButton("Refresh");
-        
-        // Set font for all buttons
-        Font buttonFont = new Font("Calibri", Font.PLAIN, 12);
-        addButton.setFont(buttonFont);
-        editButton.setFont(buttonFont);
-        deleteButton.setFont(buttonFont);
-        viewButton.setFont(buttonFont);
-        refreshButton.setFont(buttonFont);
-        
-        bottomPanel.add(addButton);
+        viewButton = UIConstants.createSecondaryButton("DETAILS",
+            UIConstants.loadIcon("/icons/details.png", 16));
+        editButton = UIConstants.createPrimaryButton("EDIT",
+            UIConstants.loadIcon("/icons/edit.png", 16));
+        deleteButton = UIConstants.createDangerButton("DELETE",
+            UIConstants.loadIcon("/icons/delete.png", 16));
+
+        bottomPanel.add(viewButton);
         bottomPanel.add(editButton);
         bottomPanel.add(deleteButton);
-        bottomPanel.add(viewButton);
-        bottomPanel.add(refreshButton);
         
         return bottomPanel;
     }
@@ -174,17 +288,20 @@ public class ClientManagementPanel extends JPanel {
         searchButton.addActionListener(e -> performSearch());
         clearButton.addActionListener(e -> clearSearch());
         
-        // Sort combo box
+        // Sort combo box - apply sorting when selection changes
         sortComboBox.addActionListener(e -> applySorting());
         
-        // Bottom panel buttons
+        // Top panel buttons
         addButton.addActionListener(e -> addClient());
+        refreshButton.addActionListener(e -> loadClients());
+        
+        // Bottom panel buttons
         editButton.addActionListener(e -> editClient());
         deleteButton.addActionListener(e -> deleteClient());
         viewButton.addActionListener(e -> viewClientDetails());
         refreshButton.addActionListener(e -> loadClients());
         
-        // Double-click to edit
+        // Double-click to edit / view
         clientTable.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -199,9 +316,14 @@ public class ClientManagementPanel extends JPanel {
         try {
             List<Client> clients = clientService.getAllClients();
             updateTable(clients);
-        } catch (Exception e) {
+        } catch (IllegalArgumentException iae) {
             JOptionPane.showMessageDialog(this,
-                "Error loading clients: " + e.getMessage(),
+                iae.getMessage(),
+                "Warning",
+                JOptionPane.WARNING_MESSAGE);
+        } catch (RuntimeException re) {
+            JOptionPane.showMessageDialog(this,
+                "Error loading clients: " + re.getMessage(),
                 "Error",
                 JOptionPane.ERROR_MESSAGE);
         }
@@ -224,7 +346,7 @@ public class ClientManagementPanel extends JPanel {
                 client.getEmail() != null ? client.getEmail() : "",
                 client.getWebsite() != null ? client.getWebsite() : "",
                 client.getPaymentMethod() != null ? client.getPaymentMethod().toString() : "",
-                client.getCreditLimit() != null ? client.getCreditLimit().toString() : "0.00",
+                client.getCreditLimit() != null ? client.getCreditLimit() : BigDecimal.ZERO,
                 client.getActive() != null ? (client.getActive() ? "Yes" : "No") : "No"
             };
             tableModel.addRow(rowData);
@@ -236,9 +358,14 @@ public class ClientManagementPanel extends JPanel {
         try {
             List<Client> clients = clientService.searchClients(searchTerm);
             updateTable(clients);
-        } catch (Exception e) {
+        } catch (IllegalArgumentException iae) {
             JOptionPane.showMessageDialog(this,
-                "Error searching clients: " + e.getMessage(),
+                iae.getMessage(),
+                "Warning",
+                JOptionPane.WARNING_MESSAGE);
+        } catch (RuntimeException re) {
+            JOptionPane.showMessageDialog(this,
+                "Error searching clients: " + re.getMessage(),
                 "Error",
                 JOptionPane.ERROR_MESSAGE);
         }
@@ -249,46 +376,60 @@ public class ClientManagementPanel extends JPanel {
         loadClients();
     }
     
+    /**
+     * Apply sorting based on the selected option in the combo box
+     */
     private void applySorting() {
         try {
             String selectedSort = (String) sortComboBox.getSelectedItem();
             List<Client> clients;
             
-            switch (selectedSort) {
-                case "Sort by ID":
-                    clients = clientService.getAllClientsOrderedById();
-                    break;
-                case "Sort by DNI":
-                    clients = clientService.getAllClientsOrderedByDni();
-                    break;
-                case "Sort by Name":
-                    clients = clientService.getAllClientsOrderedByName();
-                    break;
-                default:
-                    clients = clientService.getAllClients();
-            }
+            clients = switch (selectedSort) {
+                case "Sort by ID" -> clientService.getAllClientsOrderedById();
+                case "Sort by DNI" -> clientService.getAllClientsOrderedByDni();
+                case "Sort by Name" -> clientService.getAllClientsOrderedByName();
+                default -> clientService.getAllClients();
+            };
             
             updateTable(clients);
-        } catch (Exception e) {
+            
+        } catch (IllegalArgumentException iae) {
             JOptionPane.showMessageDialog(this,
-                "Error sorting clients: " + e.getMessage(),
+                iae.getMessage(),
+                "Warning",
+                JOptionPane.WARNING_MESSAGE);
+        } catch (RuntimeException re) {
+            JOptionPane.showMessageDialog(this,
+                "Error sorting clients: " + re.getMessage(),
                 "Error",
                 JOptionPane.ERROR_MESSAGE);
         }
     }
     
     private void addClient() {
+        Frame parent = (Frame) SwingUtilities.getWindowAncestor(this);
         ClientFormDialog dialog = new ClientFormDialog(
-            (Frame) SwingUtilities.getWindowAncestor(this),
+            parent,
             "Add New Client",
             null,
             clientService
         );
+        // ensure dialog is application-modal and centered over parent
+        dialog.setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
+        dialog.pack();
+        dialog.setLocationRelativeTo(parent);
         dialog.setVisible(true);
         
         if (dialog.isConfirmed()) {
             loadClients(); // Refresh table
         }
+    }
+
+    /**
+     * Public wrapper so other UI components can open the Add Client dialog.
+     */
+    public void showAddClient() {
+        addClient();
     }
     
     private void editClient() {
@@ -302,7 +443,6 @@ public class ClientManagementPanel extends JPanel {
         }
         
         try {
-            // Convert view row to model row
             int modelRow = clientTable.convertRowIndexToModel(selectedRow);
             Integer clientId = (Integer) tableModel.getValueAt(modelRow, 0);
             Client client = clientService.findClientById(clientId);
@@ -320,9 +460,14 @@ public class ClientManagementPanel extends JPanel {
                     loadClients(); // Refresh table
                 }
             }
-        } catch (Exception e) {
+        } catch (IllegalArgumentException iae) {
             JOptionPane.showMessageDialog(this,
-                "Error editing client: " + e.getMessage(),
+                iae.getMessage(),
+                "Warning",
+                JOptionPane.WARNING_MESSAGE);
+        } catch (RuntimeException re) {
+            JOptionPane.showMessageDialog(this,
+                "Error editing client: " + re.getMessage(),
                 "Error",
                 JOptionPane.ERROR_MESSAGE);
         }
@@ -358,9 +503,14 @@ public class ClientManagementPanel extends JPanel {
                     "Success",
                     JOptionPane.INFORMATION_MESSAGE);
             }
-        } catch (Exception e) {
+        } catch (IllegalArgumentException iae) {
             JOptionPane.showMessageDialog(this,
-                "Error deleting client: " + e.getMessage(),
+                iae.getMessage(),
+                "Warning",
+                JOptionPane.WARNING_MESSAGE);
+        } catch (RuntimeException re) {
+            JOptionPane.showMessageDialog(this,
+                "Error deleting client: " + re.getMessage(),
                 "Error",
                 JOptionPane.ERROR_MESSAGE);
         }
@@ -388,9 +538,14 @@ public class ClientManagementPanel extends JPanel {
                 );
                 dialog.setVisible(true);
             }
-        } catch (Exception e) {
+        } catch (IllegalArgumentException iae) {
             JOptionPane.showMessageDialog(this,
-                "Error viewing client details: " + e.getMessage(),
+                iae.getMessage(),
+                "Warning",
+                JOptionPane.WARNING_MESSAGE);
+        } catch (RuntimeException re) {
+            JOptionPane.showMessageDialog(this,
+                "Error viewing client details: " + re.getMessage(),
                 "Error",
                 JOptionPane.ERROR_MESSAGE);
         }

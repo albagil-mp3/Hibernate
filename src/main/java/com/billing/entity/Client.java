@@ -1,8 +1,24 @@
 package com.billing.entity;
 
-import javax.persistence.*;
-import jakarta.validation.constraints.*;
 import java.math.BigDecimal;
+import java.util.Objects;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Lob;
+import javax.persistence.Table;
+
+import jakarta.validation.constraints.DecimalMax;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 
 /**
  * Client entity representing customers in the billing system
@@ -259,15 +275,14 @@ public class Client {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        
+        if (!(o instanceof Client)) return false; // handles proxies and null
+
         Client client = (Client) o;
-        
-        return dni != null ? dni.equals(client.dni) : client.dni == null;
+        return Objects.equals(this.dni, client.dni);
     }
-    
+
     @Override
     public int hashCode() {
-        return dni != null ? dni.hashCode() : 0;
+        return Objects.hashCode(dni);
     }
 }

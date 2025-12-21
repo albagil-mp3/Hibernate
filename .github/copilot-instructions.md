@@ -23,7 +23,7 @@ This is a Java application for client management in a billing system using:
 - Ensure proper field sizing in forms
 
 ## Database Schema
-Database name: facturacion
+Database name: hibernate
 Table: clientes with fields for client information including validation rules for Spanish DNI and postal codes.
 
 ## Current Status
