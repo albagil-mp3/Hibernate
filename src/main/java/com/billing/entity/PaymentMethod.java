@@ -4,8 +4,6 @@ package com.billing.entity;
  * Enumeration for payment methods supported by the billing system
  */
 public enum PaymentMethod {
-    CREDIT("Crèdit", "Credit"),
-    CASH("Contat", "Cash"),
     TRANSFERENCIA_BANCARIA("Transferència Bancària", "Bank Transfer"),
     DOMICILIACION_BANCARIA("Domiciliació Bancària", "Direct Debit"),
     TARJETA_CREDITO("Targeta de Crèdit", "Credit Card"),

@@ -1,17 +1,31 @@
 package com.billing.gui;
 
-import com.billing.entity.Client;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Frame;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
+import java.awt.Insets;
 
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
-import java.awt.*;
+
+import com.billing.entity.Client;
 
 /**
  * Dialog for displaying complete client details in a read-only format
  */
 public class ClientDetailsDialog extends JDialog {
     
-    private Client client;
+    private final Client client;
     
     public ClientDetailsDialog(Frame parent, Client client) {
         super(parent, "Client Details", true);
@@ -36,18 +50,17 @@ public class ClientDetailsDialog extends JDialog {
         // Main content panel
         JPanel mainPanel = new JPanel(new BorderLayout());
         mainPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
-        mainPanel.setBackground(UIConstants.LAVENDER_LIGHT);
+        mainPanel.setBackground(UIConstants.MODULE_CLIENTS_BG);
         
         // Title
         JLabel titleLabel = new JLabel("Client Information", SwingConstants.CENTER);
         titleLabel.setFont(UIConstants.TITLE_FONT);
         titleLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 15, 0));
-        titleLabel.setForeground(UIConstants.ANTHRACITE);
-        // header panel so we can attach maximize/restore control at the right
+        titleLabel.setForeground(UIConstants.MODULE_CLIENTS_TEXT);
+        // header panel with centered title
         JPanel header = new JPanel(new BorderLayout());
         header.setOpaque(false);
         header.add(titleLabel, BorderLayout.CENTER);
-        UIConstants.addMaxRestoreControl(this, header);
         mainPanel.add(header, BorderLayout.NORTH);
         
         // Create info sections
@@ -68,18 +81,15 @@ public class ClientDetailsDialog extends JDialog {
         mainPanel.add(scrollPane, BorderLayout.CENTER);
         
         add(mainPanel, BorderLayout.CENTER);
-        
-        // Button panel
-        add(createButtonPanel(), BorderLayout.SOUTH);
     }
     
     private JPanel createBasicInfoPanel() {
         JPanel panel = new JPanel(new GridBagLayout());
         TitledBorder border = BorderFactory.createTitledBorder("Basic Information");
         border.setTitleFont(UIConstants.UI_FONT.deriveFont(Font.BOLD));
-        border.setTitleColor(UIConstants.PURPLE_DARK);
+        border.setTitleColor(UIConstants.MODULE_CLIENTS_TEXT);
         panel.setBorder(border);
-        panel.setBackground(UIConstants.LAVENDER_LIGHT);
+        panel.setBackground(UIConstants.MODULE_CLIENTS_BG);
         
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(5, 10, 5, 10);
@@ -92,7 +102,7 @@ public class ClientDetailsDialog extends JDialog {
         gbc.gridx = 0; gbc.gridy = 0;
         JLabel idLabel = new JLabel("ID:");
         idLabel.setFont(labelFont);
-        idLabel.setForeground(UIConstants.ANTHRACITE);
+        idLabel.setForeground(new java.awt.Color(0x212121));
         panel.add(idLabel, gbc);
         gbc.gridx = 1;
         JLabel idValue = new JLabel(client.getId() != null ? client.getId().toString() : "N/A");
@@ -103,7 +113,7 @@ public class ClientDetailsDialog extends JDialog {
         gbc.gridx = 0; gbc.gridy = 1;
         JLabel nameLabel = new JLabel("Name:");
         nameLabel.setFont(labelFont);
-        nameLabel.setForeground(UIConstants.ANTHRACITE);
+        nameLabel.setForeground(new java.awt.Color(0x212121));
         panel.add(nameLabel, gbc);
         gbc.gridx = 1;
         JLabel nameValue = new JLabel(client.getName() != null ? client.getName() : "N/A");
@@ -114,7 +124,7 @@ public class ClientDetailsDialog extends JDialog {
         gbc.gridx = 0; gbc.gridy = 2;
         JLabel dniLabel = new JLabel("DNI:");
         dniLabel.setFont(labelFont);
-        dniLabel.setForeground(UIConstants.ANTHRACITE);
+        dniLabel.setForeground(new java.awt.Color(0x212121));
         panel.add(dniLabel, gbc);
         gbc.gridx = 1;
         JLabel dniValue = new JLabel(client.getDni() != null ? client.getDni() : "N/A");
@@ -125,7 +135,7 @@ public class ClientDetailsDialog extends JDialog {
         gbc.gridx = 0; gbc.gridy = 3;
         JLabel addressLabel = new JLabel("Address:");
         addressLabel.setFont(labelFont);
-        addressLabel.setForeground(UIConstants.ANTHRACITE);
+        addressLabel.setForeground(new java.awt.Color(0x212121));
         panel.add(addressLabel, gbc);
         gbc.gridx = 1; gbc.gridwidth = 2; gbc.fill = GridBagConstraints.HORIZONTAL;
         JLabel addressValue = new JLabel(client.getAddress() != null ? client.getAddress() : "N/A");
@@ -136,7 +146,7 @@ public class ClientDetailsDialog extends JDialog {
         gbc.gridx = 0; gbc.gridy = 4; gbc.gridwidth = 1; gbc.fill = GridBagConstraints.NONE;
         JLabel cityLabel = new JLabel("City:");
         cityLabel.setFont(labelFont);
-        cityLabel.setForeground(UIConstants.ANTHRACITE);
+        cityLabel.setForeground(new java.awt.Color(0x212121));
         panel.add(cityLabel, gbc);
         gbc.gridx = 1;
         JLabel cityValue = new JLabel(client.getCity() != null ? client.getCity() : "N/A");
@@ -147,7 +157,7 @@ public class ClientDetailsDialog extends JDialog {
         gbc.gridx = 0; gbc.gridy = 5;
         JLabel provinceLabel = new JLabel("Province:");
         provinceLabel.setFont(labelFont);
-        provinceLabel.setForeground(UIConstants.ANTHRACITE);
+        provinceLabel.setForeground(new java.awt.Color(0x212121));
         panel.add(provinceLabel, gbc);
         gbc.gridx = 1;
         JLabel provinceValue = new JLabel(client.getProvince() != null ? client.getProvince().getDisplayName() : "N/A");
@@ -158,7 +168,7 @@ public class ClientDetailsDialog extends JDialog {
         gbc.gridx = 0; gbc.gridy = 6;
         JLabel postalCodeLabel = new JLabel("Postal Code:");
         postalCodeLabel.setFont(labelFont);
-        postalCodeLabel.setForeground(UIConstants.ANTHRACITE);
+        postalCodeLabel.setForeground(new java.awt.Color(0x212121));
         panel.add(postalCodeLabel, gbc);
         gbc.gridx = 1;
         JLabel postalCodeValue = new JLabel(client.getPostalCode() != null ? client.getPostalCode() : "N/A");
@@ -172,9 +182,9 @@ public class ClientDetailsDialog extends JDialog {
         JPanel panel = new JPanel(new GridBagLayout());
         TitledBorder border = BorderFactory.createTitledBorder("Contact Information");
         border.setTitleFont(UIConstants.UI_FONT.deriveFont(Font.BOLD));
-        border.setTitleColor(UIConstants.PURPLE_DARK);
+        border.setTitleColor(UIConstants.MODULE_CLIENTS_TEXT);
         panel.setBorder(border);
-        panel.setBackground(UIConstants.LAVENDER_LIGHT);
+        panel.setBackground(UIConstants.MODULE_CLIENTS_BG);
         
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(5, 10, 5, 10);
@@ -187,7 +197,7 @@ public class ClientDetailsDialog extends JDialog {
         gbc.gridx = 0; gbc.gridy = 0;
         JLabel fixedPhoneLabel = new JLabel("Fixed Phone:");
         fixedPhoneLabel.setFont(labelFont);
-        fixedPhoneLabel.setForeground(UIConstants.ANTHRACITE);
+        fixedPhoneLabel.setForeground(new java.awt.Color(0x212121));
         panel.add(fixedPhoneLabel, gbc);
         gbc.gridx = 1;
         JLabel fixedPhoneValue = new JLabel(client.getFixedPhone() != null ? client.getFixedPhone() : "N/A");
@@ -198,7 +208,7 @@ public class ClientDetailsDialog extends JDialog {
         gbc.gridx = 0; gbc.gridy = 1;
         JLabel mobilePhoneLabel = new JLabel("Mobile Phone:");
         mobilePhoneLabel.setFont(labelFont);
-        mobilePhoneLabel.setForeground(UIConstants.ANTHRACITE);
+        mobilePhoneLabel.setForeground(new java.awt.Color(0x212121));
         panel.add(mobilePhoneLabel, gbc);
         gbc.gridx = 1;
         JLabel mobilePhoneValue = new JLabel(client.getMobilePhone() != null ? client.getMobilePhone() : "N/A");
@@ -209,7 +219,7 @@ public class ClientDetailsDialog extends JDialog {
         gbc.gridx = 0; gbc.gridy = 2;
         JLabel emailLabel = new JLabel("Email:");
         emailLabel.setFont(labelFont);
-        emailLabel.setForeground(UIConstants.ANTHRACITE);
+        emailLabel.setForeground(new java.awt.Color(0x212121));
         panel.add(emailLabel, gbc);
         gbc.gridx = 1; gbc.gridwidth = 2; gbc.fill = GridBagConstraints.HORIZONTAL;
         JLabel emailValue = new JLabel(client.getEmail() != null ? client.getEmail() : "N/A");
@@ -220,7 +230,7 @@ public class ClientDetailsDialog extends JDialog {
         gbc.gridx = 0; gbc.gridy = 3; gbc.gridwidth = 1; gbc.fill = GridBagConstraints.NONE;
         JLabel websiteLabel = new JLabel("Website:");
         websiteLabel.setFont(labelFont);
-        websiteLabel.setForeground(UIConstants.ANTHRACITE);
+        websiteLabel.setForeground(new java.awt.Color(0x212121));
         panel.add(websiteLabel, gbc);
         gbc.gridx = 1; gbc.gridwidth = 2; gbc.fill = GridBagConstraints.HORIZONTAL;
         JLabel websiteValue = new JLabel(client.getWebsite() != null ? client.getWebsite() : "N/A");
@@ -234,9 +244,9 @@ public class ClientDetailsDialog extends JDialog {
         JPanel panel = new JPanel(new GridBagLayout());
         TitledBorder border = BorderFactory.createTitledBorder("Payment Information");
         border.setTitleFont(UIConstants.UI_FONT.deriveFont(Font.BOLD));
-        border.setTitleColor(UIConstants.PURPLE_DARK);
+        border.setTitleColor(UIConstants.MODULE_CLIENTS_TEXT);
         panel.setBorder(border);
-        panel.setBackground(UIConstants.LAVENDER_LIGHT);
+        panel.setBackground(UIConstants.MODULE_CLIENTS_BG);
         
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(5, 10, 5, 10);
@@ -249,7 +259,7 @@ public class ClientDetailsDialog extends JDialog {
         gbc.gridx = 0; gbc.gridy = 0;
         JLabel paymentMethodLabel = new JLabel("Payment Method:");
         paymentMethodLabel.setFont(labelFont);
-        paymentMethodLabel.setForeground(UIConstants.ANTHRACITE);
+        paymentMethodLabel.setForeground(new java.awt.Color(0x212121));
         panel.add(paymentMethodLabel, gbc);
         gbc.gridx = 1;
         JLabel paymentMethodValue = new JLabel(client.getPaymentMethod() != null ? client.getPaymentMethod().toString() : "N/A");
@@ -260,7 +270,7 @@ public class ClientDetailsDialog extends JDialog {
         gbc.gridx = 0; gbc.gridy = 1;
         JLabel creditLimitLabel = new JLabel("Credit Limit:");
         creditLimitLabel.setFont(labelFont);
-        creditLimitLabel.setForeground(UIConstants.ANTHRACITE);
+        creditLimitLabel.setForeground(new java.awt.Color(0x212121));
         panel.add(creditLimitLabel, gbc);
         gbc.gridx = 1;
         String creditLimitText = client.getCreditLimit() != null ? "€" + client.getCreditLimit().toString() : "€0.00";
@@ -272,7 +282,7 @@ public class ClientDetailsDialog extends JDialog {
         gbc.gridx = 0; gbc.gridy = 2;
         JLabel bankAccountLabel = new JLabel("Bank Account:");
         bankAccountLabel.setFont(labelFont);
-        bankAccountLabel.setForeground(UIConstants.ANTHRACITE);
+        bankAccountLabel.setForeground(new java.awt.Color(0x212121));
         panel.add(bankAccountLabel, gbc);
         gbc.gridx = 1; gbc.gridwidth = 2; gbc.fill = GridBagConstraints.HORIZONTAL;
         JLabel bankAccountValue = new JLabel(client.getBankAccountNumber() != null ? client.getBankAccountNumber() : "N/A");
@@ -283,17 +293,17 @@ public class ClientDetailsDialog extends JDialog {
         gbc.gridx = 0; gbc.gridy = 3; gbc.gridwidth = 1; gbc.fill = GridBagConstraints.NONE;
         JLabel activeLabel = new JLabel("Status:");
         activeLabel.setFont(labelFont);
-        activeLabel.setForeground(UIConstants.ANTHRACITE);
+        activeLabel.setForeground(new java.awt.Color(0x212121));
         panel.add(activeLabel, gbc);
         gbc.gridx = 1;
         String activeText = client.getActive() != null ? (client.getActive() ? "Active" : "Inactive") : "Inactive";
         JLabel activeValue = new JLabel(activeText);
         activeValue.setFont(valueFont);
         // Set color based on status using accent palette
-        if (client.getActive() != null && client.getActive()) {
-            activeValue.setForeground(UIConstants.TURQUOISE_ACCENT.darker());
+            if (client.getActive() != null && client.getActive()) {
+            activeValue.setForeground(UIConstants.MODULE_CLIENTS_TEXT.darker());
         } else {
-            activeValue.setForeground(UIConstants.PURPLE_MAIN.darker());
+            activeValue.setForeground(UIConstants.MODULE_CLIENTS_TEXT.darker());
         }
         panel.add(activeValue, gbc);
         
@@ -304,9 +314,9 @@ public class ClientDetailsDialog extends JDialog {
         JPanel panel = new JPanel(new BorderLayout());
         TitledBorder border = BorderFactory.createTitledBorder("Observations");
         border.setTitleFont(UIConstants.UI_FONT.deriveFont(Font.BOLD));
-        border.setTitleColor(UIConstants.PURPLE_DARK);
+        border.setTitleColor(UIConstants.MODULE_CLIENTS_TEXT);
         panel.setBorder(border);
-        panel.setBackground(UIConstants.LAVENDER_LIGHT);
+        panel.setBackground(UIConstants.MODULE_CLIENTS_BG);
         
         JTextArea observationsArea = new JTextArea();
         observationsArea.setFont(UIConstants.UI_FONT);
@@ -326,27 +336,11 @@ public class ClientDetailsDialog extends JDialog {
         return panel;
     }
     
-    private JPanel createButtonPanel() {
-        JPanel panel = new JPanel(new FlowLayout());
-        panel.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
-        panel.setBackground(UIConstants.LAVENDER_LIGHT);
-        
-        JButton closeButton = new JButton("Close");
-        closeButton.setFont(UIConstants.UI_FONT);
-        closeButton.setPreferredSize(new Dimension(80, 30));
-        UIConstants.styleDialogButton(closeButton, UIConstants.PURPLE_MAIN, UIConstants.BONE_WHITE);
-         closeButton.addActionListener(e -> dispose());
-        
-        panel.add(closeButton);
-        
-        return panel;
-    }
-    
     private void configureDialog() {
-        getContentPane().setBackground(UIConstants.LAVENDER_LIGHT);
+        getContentPane().setBackground(UIConstants.MODULE_CLIENTS_BG);
         setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+        setResizable(true);
         pack();
         setLocationRelativeTo(getParent());
-        setResizable(true);
     }
 }

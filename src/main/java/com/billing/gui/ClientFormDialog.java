@@ -1,14 +1,34 @@
 package com.billing.gui;
 
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.Frame;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
+import java.awt.Insets;
+import java.math.BigDecimal;
+
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
+import javax.swing.border.TitledBorder;
+
 import com.billing.entity.Client;
 import com.billing.entity.PaymentMethod;
 import com.billing.entity.SpanishProvince;
 import com.billing.service.ClientService;
-
-import javax.swing.*;
-import javax.swing.border.TitledBorder;
-import java.awt.*;
-import java.math.BigDecimal;
 
 /**
  * Dialog for creating and editing client information
@@ -16,7 +36,7 @@ import java.math.BigDecimal;
  */
 public class ClientFormDialog extends JDialog {
     
-    private ClientService clientService;
+    private final ClientService clientService;
     private Client client;
     private boolean confirmed = false;
     
@@ -112,19 +132,17 @@ public class ClientFormDialog extends JDialog {
         // Main content panel
         JPanel mainPanel = new JPanel(new BorderLayout());
         mainPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
-        mainPanel.setBackground(UIConstants.LAVENDER_LIGHT);
+        mainPanel.setBackground(UIConstants.MODULE_CLIENTS_BG);
         
         // Title / header area
-        JPanel topPanel = new JPanel(new BorderLayout());
-        topPanel.setOpaque(false);
         JLabel titleLabel = new JLabel(getTitle(), SwingConstants.CENTER);
         titleLabel.setFont(UIConstants.TITLE_FONT);
         titleLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
-        titleLabel.setForeground(UIConstants.ANTHRACITE);
-        topPanel.add(titleLabel, BorderLayout.NORTH);
-        // add maximize / restore control to the header
-        UIConstants.addMaxRestoreControl(this, topPanel);
-        mainPanel.add(topPanel, BorderLayout.NORTH);
+        titleLabel.setForeground(UIConstants.MODULE_CLIENTS_ICON);
+        JPanel header = new JPanel(new BorderLayout());
+        header.setOpaque(false);
+        header.add(titleLabel, BorderLayout.CENTER);
+        mainPanel.add(header, BorderLayout.NORTH);
         
         // Create form sections
         JPanel formPanel = new JPanel(new GridLayout(3, 1, 0, 10));
@@ -154,7 +172,7 @@ public class ClientFormDialog extends JDialog {
         southWrapper.setOpaque(false);
         JLabel requiredNote = new JLabel("Los campos marcados con * son obligatorios", SwingConstants.CENTER);
         requiredNote.setFont(UIConstants.UI_FONT.deriveFont(Font.ITALIC, 12f));
-        requiredNote.setForeground(UIConstants.PURPLE_DARK);
+        requiredNote.setForeground(UIConstants.MODULE_CLIENTS_TEXT);
         requiredNote.setBorder(BorderFactory.createEmptyBorder(6, 0, 6, 0));
         southWrapper.add(requiredNote, BorderLayout.NORTH);
         southWrapper.add(createButtonPanel(), BorderLayout.SOUTH);
@@ -165,9 +183,9 @@ public class ClientFormDialog extends JDialog {
         JPanel panel = new JPanel(new GridBagLayout());
         TitledBorder border = BorderFactory.createTitledBorder("Basic Information");
         border.setTitleFont(UIConstants.UI_FONT.deriveFont(Font.BOLD));
-        border.setTitleColor(UIConstants.PURPLE_DARK);
+        border.setTitleColor(UIConstants.MODULE_CLIENTS_TEXT);
         panel.setBorder(border);
-        panel.setBackground(UIConstants.LAVENDER_LIGHT);
+        panel.setBackground(UIConstants.MODULE_CLIENTS_BG);
         
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(5, 5, 5, 5);
@@ -177,7 +195,7 @@ public class ClientFormDialog extends JDialog {
         gbc.gridx = 0; gbc.gridy = 0;
         JLabel nameLabel = new JLabel("Name *:");
         nameLabel.setFont(UIConstants.UI_FONT);
-        nameLabel.setForeground(UIConstants.ANTHRACITE);
+        nameLabel.setForeground(new java.awt.Color(0x212121));
         panel.add(nameLabel, gbc);
         gbc.gridx = 1; gbc.gridwidth = 2; gbc.fill = GridBagConstraints.HORIZONTAL;
         panel.add(nameField, gbc);
@@ -186,7 +204,7 @@ public class ClientFormDialog extends JDialog {
         gbc.gridx = 0; gbc.gridy = 1; gbc.gridwidth = 1; gbc.fill = GridBagConstraints.NONE;
         JLabel dniLabel = new JLabel("DNI *:");
         dniLabel.setFont(UIConstants.UI_FONT);
-        dniLabel.setForeground(UIConstants.ANTHRACITE);
+        dniLabel.setForeground(new java.awt.Color(0x212121));
         panel.add(dniLabel, gbc);
         gbc.gridx = 1;
         panel.add(dniField, gbc);
@@ -195,7 +213,7 @@ public class ClientFormDialog extends JDialog {
         gbc.gridx = 0; gbc.gridy = 2;
         JLabel addressLabel = new JLabel("Address *:");
         addressLabel.setFont(UIConstants.UI_FONT);
-        addressLabel.setForeground(UIConstants.ANTHRACITE);
+        addressLabel.setForeground(new java.awt.Color(0x212121));
         panel.add(addressLabel, gbc);
         gbc.gridx = 1; gbc.gridwidth = 2; gbc.fill = GridBagConstraints.HORIZONTAL;
         panel.add(addressField, gbc);
@@ -204,7 +222,7 @@ public class ClientFormDialog extends JDialog {
         gbc.gridx = 0; gbc.gridy = 3; gbc.gridwidth = 1; gbc.fill = GridBagConstraints.NONE;
         JLabel cityLabel = new JLabel("City *:");
         cityLabel.setFont(UIConstants.UI_FONT);
-        cityLabel.setForeground(UIConstants.ANTHRACITE);
+        cityLabel.setForeground(new java.awt.Color(0x212121));
         panel.add(cityLabel, gbc);
         gbc.gridx = 1;
         panel.add(cityField, gbc);
@@ -212,7 +230,7 @@ public class ClientFormDialog extends JDialog {
         gbc.gridx = 2;
         JLabel provinceLabel = new JLabel("Province *:");
         provinceLabel.setFont(UIConstants.UI_FONT);
-        provinceLabel.setForeground(UIConstants.ANTHRACITE);
+        provinceLabel.setForeground(new java.awt.Color(0x212121));
         panel.add(provinceLabel, gbc);
         gbc.gridx = 3;
         panel.add(provinceComboBox, gbc);
@@ -221,7 +239,7 @@ public class ClientFormDialog extends JDialog {
         gbc.gridx = 0; gbc.gridy = 4;
         JLabel postalLabel = new JLabel("Postal Code:");
         postalLabel.setFont(UIConstants.UI_FONT);
-        postalLabel.setForeground(UIConstants.ANTHRACITE);
+        postalLabel.setForeground(new java.awt.Color(0x212121));
         panel.add(postalLabel, gbc);
         gbc.gridx = 1;
         panel.add(postalCodeField, gbc);
@@ -233,9 +251,9 @@ public class ClientFormDialog extends JDialog {
         JPanel panel = new JPanel(new GridBagLayout());
         TitledBorder border = BorderFactory.createTitledBorder("Contact Information");
         border.setTitleFont(UIConstants.UI_FONT.deriveFont(Font.BOLD));
-        border.setTitleColor(UIConstants.PURPLE_DARK);
+        border.setTitleColor(UIConstants.MODULE_CLIENTS_TEXT);
         panel.setBorder(border);
-        panel.setBackground(UIConstants.LAVENDER_LIGHT);
+        panel.setBackground(UIConstants.MODULE_CLIENTS_BG);
         
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(5, 5, 5, 5);
@@ -245,7 +263,7 @@ public class ClientFormDialog extends JDialog {
         gbc.gridx = 0; gbc.gridy = 0;
         JLabel fixedPhoneLabel = new JLabel("Fixed Phone:");
         fixedPhoneLabel.setFont(UIConstants.UI_FONT);
-        fixedPhoneLabel.setForeground(UIConstants.ANTHRACITE);
+        fixedPhoneLabel.setForeground(new java.awt.Color(0x212121));
         panel.add(fixedPhoneLabel, gbc);
         gbc.gridx = 1;
         panel.add(fixedPhoneField, gbc);
@@ -253,7 +271,7 @@ public class ClientFormDialog extends JDialog {
         gbc.gridx = 2;
         JLabel mobilePhoneLabel = new JLabel("Mobile Phone:");
         mobilePhoneLabel.setFont(UIConstants.UI_FONT);
-        mobilePhoneLabel.setForeground(UIConstants.ANTHRACITE);
+        mobilePhoneLabel.setForeground(new java.awt.Color(0x212121));
         panel.add(mobilePhoneLabel, gbc);
         gbc.gridx = 3;
         panel.add(mobilePhoneField, gbc);
@@ -262,7 +280,7 @@ public class ClientFormDialog extends JDialog {
         gbc.gridx = 0; gbc.gridy = 1;
         JLabel emailLabel = new JLabel("Email:");
         emailLabel.setFont(UIConstants.UI_FONT);
-        emailLabel.setForeground(UIConstants.ANTHRACITE);
+        emailLabel.setForeground(new java.awt.Color(0x212121));
         panel.add(emailLabel, gbc);
         gbc.gridx = 1; gbc.gridwidth = 2; gbc.fill = GridBagConstraints.HORIZONTAL;
         panel.add(emailField, gbc);
@@ -271,7 +289,7 @@ public class ClientFormDialog extends JDialog {
         gbc.gridx = 0; gbc.gridy = 2; gbc.gridwidth = 1; gbc.fill = GridBagConstraints.NONE;
         JLabel websiteLabel = new JLabel("Website:");
         websiteLabel.setFont(UIConstants.UI_FONT);
-        websiteLabel.setForeground(UIConstants.ANTHRACITE);
+        websiteLabel.setForeground(new java.awt.Color(0x212121));
         panel.add(websiteLabel, gbc);
         gbc.gridx = 1; gbc.gridwidth = 2; gbc.fill = GridBagConstraints.HORIZONTAL;
         panel.add(websiteField, gbc);
@@ -283,9 +301,9 @@ public class ClientFormDialog extends JDialog {
         JPanel panel = new JPanel(new GridBagLayout());
         TitledBorder border = BorderFactory.createTitledBorder("Payment Information");
         border.setTitleFont(UIConstants.UI_FONT.deriveFont(Font.BOLD));
-        border.setTitleColor(UIConstants.PURPLE_DARK);
+        border.setTitleColor(UIConstants.MODULE_CLIENTS_TEXT);
         panel.setBorder(border);
-        panel.setBackground(UIConstants.LAVENDER_LIGHT);
+        panel.setBackground(UIConstants.MODULE_CLIENTS_BG);
         
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(5, 5, 5, 5);
@@ -295,7 +313,7 @@ public class ClientFormDialog extends JDialog {
         gbc.gridx = 0; gbc.gridy = 0;
         JLabel pmLabel = new JLabel("Payment Method *:");
         pmLabel.setFont(UIConstants.UI_FONT);
-        pmLabel.setForeground(UIConstants.ANTHRACITE);
+        pmLabel.setForeground(new java.awt.Color(0x212121));
         panel.add(pmLabel, gbc);
         gbc.gridx = 1;
         panel.add(paymentMethodComboBox, gbc);
@@ -304,7 +322,7 @@ public class ClientFormDialog extends JDialog {
         gbc.gridx = 2;
         JLabel clLabel = new JLabel("Credit Limit (€):");
         clLabel.setFont(UIConstants.UI_FONT);
-        clLabel.setForeground(UIConstants.ANTHRACITE);
+        clLabel.setForeground(new java.awt.Color(0x212121));
         panel.add(clLabel, gbc);
         gbc.gridx = 3;
         panel.add(creditLimitField, gbc);
@@ -313,7 +331,7 @@ public class ClientFormDialog extends JDialog {
         gbc.gridx = 0; gbc.gridy = 1;
         JLabel bankLabel = new JLabel("Bank Account (IBAN):");
         bankLabel.setFont(UIConstants.UI_FONT);
-        bankLabel.setForeground(UIConstants.ANTHRACITE);
+        bankLabel.setForeground(new java.awt.Color(0x212121));
         panel.add(bankLabel, gbc);
         gbc.gridx = 1; gbc.gridwidth = 2; gbc.fill = GridBagConstraints.HORIZONTAL;
         panel.add(bankAccountField, gbc);
@@ -329,9 +347,9 @@ public class ClientFormDialog extends JDialog {
         JPanel panel = new JPanel(new BorderLayout());
         TitledBorder border = BorderFactory.createTitledBorder("Observations");
         border.setTitleFont(UIConstants.UI_FONT.deriveFont(Font.BOLD));
-        border.setTitleColor(UIConstants.PURPLE_DARK);
+        border.setTitleColor(UIConstants.MODULE_CLIENTS_TEXT);
         panel.setBorder(border);
-        panel.setBackground(UIConstants.LAVENDER_LIGHT);
+        panel.setBackground(UIConstants.MODULE_CLIENTS_BG);
         
         JScrollPane scrollPane = new JScrollPane(observationsArea);
         scrollPane.setPreferredSize(new Dimension(0, 80));
@@ -342,43 +360,25 @@ public class ClientFormDialog extends JDialog {
     }
     
     private JPanel createButtonPanel() {
-        JPanel panel = new JPanel(new FlowLayout());
+        JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 8, 5));
         panel.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
-        panel.setBackground(UIConstants.LAVENDER_LIGHT);
+        panel.setBackground(UIConstants.MODULE_CLIENTS_BG);
 
-        JButton saveButton = new JButton("Save");
-        JButton cancelButton = new JButton("Cancel");
+        JButton saveButton = UIConstants.createSuccessButton("SAVE", null);
+        JButton cancelButton = UIConstants.createDangerButton("CANCEL", null);
 
-        saveButton.setFont(UIConstants.UI_FONT.deriveFont(Font.BOLD));
-        cancelButton.setFont(UIConstants.UI_FONT);
+        // add listeners directly
+        saveButton.addActionListener(e -> saveClient());
+        cancelButton.addActionListener(e -> cancelDialog());
 
-        saveButton.setPreferredSize(new Dimension(80, 30));
-        cancelButton.setPreferredSize(new Dimension(80, 30));
-
-        // Apply consistent filled styling with hover/press feedback (delegate to UIConstants)
-        UIConstants.styleDialogButton(saveButton, UIConstants.TURQUOISE_ACCENT, UIConstants.BONE_WHITE);
-        UIConstants.styleDialogButton(cancelButton, UIConstants.PURPLE_MAIN, UIConstants.BONE_WHITE);
-
-        panel.add(saveButton);
         panel.add(cancelButton);
+        panel.add(saveButton);
 
         return panel;
     }
     
     private void setupEventHandlers() {
-        // Save button
-        Component[] buttonPanelComponents = ((JPanel) getContentPane().getComponent(1)).getComponents();
-        for (Component comp : buttonPanelComponents) {
-            if (comp instanceof JButton) {
-                JButton button = (JButton) comp;
-                if ("Save".equals(button.getText())) {
-                    button.addActionListener(e -> saveClient());
-                } else if ("Cancel".equals(button.getText())) {
-                    button.addActionListener(e -> cancelDialog());
-                }
-            }
-        }
-        
+        // Save/Cancel listeners are attached directly in createButtonPanel()
         // Auto-fill province based on postal code
         postalCodeField.addFocusListener(new java.awt.event.FocusAdapter() {
             @Override
@@ -420,13 +420,14 @@ public class ClientFormDialog extends JDialog {
             }
             
             bankAccountField.setText(client.getBankAccountNumber());
-            activeCheckBox.setSelected(client.getActive() != null ? client.getActive() : true);
+            Boolean active = client.getActive();
+            activeCheckBox.setSelected(active != null ? active : true);
             observationsArea.setText(client.getObservations());
         }
     }
     
     private void configureDialog() {
-        getContentPane().setBackground(UIConstants.LAVENDER_LIGHT);
+        getContentPane().setBackground(UIConstants.MODULE_CLIENTS_BG);
         setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
         // allow resizing and sensible minimum size; center relative to parent
         setResizable(true);
@@ -521,7 +522,14 @@ public class ClientFormDialog extends JDialog {
             confirmed = true;
             dispose();
             
-        } catch (Exception e) {
+        } catch (IllegalArgumentException e) {
+            // Validation or business rule failures
+            JOptionPane.showMessageDialog(this,
+                e.getMessage(),
+                "Validation Error",
+                JOptionPane.WARNING_MESSAGE);
+        } catch (RuntimeException e) {
+            // Persistence or unexpected runtime errors
             JOptionPane.showMessageDialog(this,
                 "Error saving client: " + e.getMessage(),
                 "Error",

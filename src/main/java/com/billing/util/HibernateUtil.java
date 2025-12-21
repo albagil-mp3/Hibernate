@@ -1,8 +1,10 @@
 package com.billing.util;
 
+import java.util.logging.Logger;
+
+import org.hibernate.HibernateException;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
-import java.util.logging.Logger;
 
 /**
  * Hibernate utility class for managing SessionFactory
@@ -38,13 +40,18 @@ public class HibernateUtil {
         
         try {
             String configFile = getConfigurationFile();
-            logger.info("Initializing Hibernate SessionFactory with " + configFile + "...");
+            logger.info(() -> "Initializing Hibernate SessionFactory with " + configFile + "...");
             // Create the SessionFactory from appropriate configuration file
             sessionFactory = new Configuration().configure(configFile).buildSessionFactory();
             logger.info("Hibernate SessionFactory initialized successfully for MySQL database");
-        } catch (Exception ex) {
-            // Log the exception but don't throw it
-            logger.severe("SessionFactory creation failed: " + ex.getMessage());
+        } catch (HibernateException ex) {
+            // Specific Hibernate-related errors
+            logger.severe(() -> "Hibernate error during SessionFactory creation: " + ex.getMessage());
+            initializationError = ex;
+            sessionFactory = null;
+        } catch (RuntimeException ex) {
+            // Other runtime problems (config file missing, classpath issues, etc.)
+            logger.severe(() -> "Runtime error during SessionFactory creation: " + ex.getMessage());
             initializationError = ex;
             sessionFactory = null;
         } finally {
@@ -84,8 +91,13 @@ public class HibernateUtil {
             try {
                 sessionFactory.close();
                 logger.info("Hibernate SessionFactory shutdown completed");
-            } catch (Exception e) {
-                logger.warning("Error during SessionFactory shutdown: " + e.getMessage());
+                // Mark as not initialized so a new SessionFactory can be created later if needed
+                sessionFactory = null;
+                initialized = false;
+            } catch (HibernateException e) {
+                logger.warning(() -> "Hibernate error during SessionFactory shutdown: " + e.getMessage());
+            } catch (RuntimeException e) {
+                logger.warning(() -> "Runtime error during SessionFactory shutdown: " + e.getMessage());
             }
         }
     }

@@ -1,11 +1,14 @@
 package com.billing.main;
 
+import java.awt.Font;
+import java.util.logging.Logger;
+
+import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+
 import com.billing.gui.MainWindow;
 import com.billing.util.HibernateUtil;
-
-import javax.swing.*;
-import java.awt.*;
-import java.util.logging.Logger;
 
 /**
  * Main application class for the Hibernate Billing System
@@ -14,7 +17,6 @@ import java.util.logging.Logger;
 public class MainApplication {
     
     private static final Logger logger = Logger.getLogger(MainApplication.class.getName());
-    
     public static void main(String[] args) {
         try {
             // Set Look and Feel to system default
@@ -35,17 +37,20 @@ public class MainApplication {
                     
                     // Check database connection status
                     if (!HibernateUtil.isInitialized()) {
-                        showDatabaseConnectionError(HibernateUtil.getInitializationError(), "mysql");
+                        showDatabaseConnectionError(HibernateUtil.getInitializationError());
                     }
                 } catch (Exception e) {
-                    logger.severe("Error starting application: " + e.getMessage());
-                    showDatabaseConnectionError(e, "mysql");
+                    logger.severe(() -> "Error starting application: " + e.getMessage());
+                    showDatabaseConnectionError(e);
                 }
             });
             
-        } catch (Exception e) {
-            logger.severe("Failed to start application: " + e.getMessage());
-            showDatabaseConnectionError(e, "mysql");
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | javax.swing.UnsupportedLookAndFeelException e) {
+            logger.severe(() -> "Failed to set look and feel: " + e.getMessage());
+            showDatabaseConnectionError(e);
+        } catch (RuntimeException e) {
+            logger.severe(() -> "Failed to start application: " + e.getMessage());
+            showDatabaseConnectionError(e);
         }
         
         // Add shutdown hook to cleanup resources
@@ -59,19 +64,22 @@ public class MainApplication {
     /**
      * Shows database connection error message with helpful instructions
      */
-    private static void showDatabaseConnectionError(Exception e, String databaseType) {
+    private static void showDatabaseConnectionError(Exception e) {
         String message = "Database Connection Error\n\n";
         
         if (e.getMessage().contains("Communications link failure") || 
             e.getMessage().contains("Connection refused")) {
-            message += "Cannot connect to MySQL database.\n\n" +
-                      "Please check:\n" +
-                      "• MySQL server is running\n" +
-                      "• Database 'hibernate' exists\n" +
-                      "• Username and password are correct\n" +
-                      "• MySQL is listening on port 3306\n\n" +
-                      "The application will start in offline mode.\n" +
-                      "Database features will not be available.";
+            message += """
+                       Cannot connect to MySQL database.
+                       
+                       Please check:
+                       \u2022 MySQL server is running
+                       \u2022 Database 'hibernate' exists
+                       \u2022 Username and password are correct
+                       \u2022 MySQL is listening on port 3306
+                       
+                       The application will start in offline mode.
+                       Database features will not be available.""";
         } else {
             message += "Error: " + e.getMessage() + "\n\n" +
                       "Please check your database configuration.";

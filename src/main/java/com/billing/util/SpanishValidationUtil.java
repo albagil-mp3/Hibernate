@@ -64,7 +64,7 @@ public class SpanishValidationUtil {
         try {
             // Extract the numeric part (22 digits after ES)
             String numericPart = iban.substring(2);
-            Long.parseLong(numericPart);
+            Long.valueOf(numericPart);
             return true;
         } catch (NumberFormatException e) {
             return false;
@@ -82,7 +82,7 @@ public class SpanishValidationUtil {
         }
         
         try {
-            Long.parseLong(phone);
+            Long.valueOf(phone);
             return true;
         } catch (NumberFormatException e) {
             return false;
