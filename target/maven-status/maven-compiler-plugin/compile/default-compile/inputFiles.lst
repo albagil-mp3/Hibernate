@@ -1,14 +1,36 @@
-C:\Visual\Hibernate\src\main\java\com\billing\dao\ClientDAO.java
-C:\Visual\Hibernate\src\main\java\com\billing\dao\ClientDAOImpl.java
-C:\Visual\Hibernate\src\main\java\com\billing\dao\GenericDAO.java
-C:\Visual\Hibernate\src\main\java\com\billing\entity\Client.java
-C:\Visual\Hibernate\src\main\java\com\billing\entity\PaymentMethod.java
-C:\Visual\Hibernate\src\main\java\com\billing\entity\SpanishProvince.java
-C:\Visual\Hibernate\src\main\java\com\billing\gui\ClientDetailsDialog.java
-C:\Visual\Hibernate\src\main\java\com\billing\gui\ClientFormDialog.java
-C:\Visual\Hibernate\src\main\java\com\billing\gui\ClientManagementPanel.java
-C:\Visual\Hibernate\src\main\java\com\billing\gui\MainWindow.java
-C:\Visual\Hibernate\src\main\java\com\billing\main\MainApplication.java
-C:\Visual\Hibernate\src\main\java\com\billing\service\ClientService.java
-C:\Visual\Hibernate\src\main\java\com\billing\util\HibernateUtil.java
-C:\Visual\Hibernate\src\main\java\com\billing\util\SpanishValidationUtil.java
+C:\Users\albag\Documents\2o\ACCESO DATOS\TEMA 3\Hibernate\src\main\java\com\billing\dao\ArticleCategoryDAO.java
+C:\Users\albag\Documents\2o\ACCESO DATOS\TEMA 3\Hibernate\src\main\java\com\billing\dao\ArticleCategoryDAOImpl.java
+C:\Users\albag\Documents\2o\ACCESO DATOS\TEMA 3\Hibernate\src\main\java\com\billing\dao\ArticleDAO.java
+C:\Users\albag\Documents\2o\ACCESO DATOS\TEMA 3\Hibernate\src\main\java\com\billing\dao\ArticleDAOImpl.java
+C:\Users\albag\Documents\2o\ACCESO DATOS\TEMA 3\Hibernate\src\main\java\com\billing\dao\ArticleFamilyDAO.java
+C:\Users\albag\Documents\2o\ACCESO DATOS\TEMA 3\Hibernate\src\main\java\com\billing\dao\ArticleFamilyDAOImpl.java
+C:\Users\albag\Documents\2o\ACCESO DATOS\TEMA 3\Hibernate\src\main\java\com\billing\dao\ClientDAO.java
+C:\Users\albag\Documents\2o\ACCESO DATOS\TEMA 3\Hibernate\src\main\java\com\billing\dao\ClientDAOImpl.java
+C:\Users\albag\Documents\2o\ACCESO DATOS\TEMA 3\Hibernate\src\main\java\com\billing\dao\GenericDAO.java
+C:\Users\albag\Documents\2o\ACCESO DATOS\TEMA 3\Hibernate\src\main\java\com\billing\dao\SupplierDAO.java
+C:\Users\albag\Documents\2o\ACCESO DATOS\TEMA 3\Hibernate\src\main\java\com\billing\dao\SupplierDAOImpl.java
+C:\Users\albag\Documents\2o\ACCESO DATOS\TEMA 3\Hibernate\src\main\java\com\billing\dao\UnitDAO.java
+C:\Users\albag\Documents\2o\ACCESO DATOS\TEMA 3\Hibernate\src\main\java\com\billing\dao\UnitDAOImpl.java
+C:\Users\albag\Documents\2o\ACCESO DATOS\TEMA 3\Hibernate\src\main\java\com\billing\entity\Article.java
+C:\Users\albag\Documents\2o\ACCESO DATOS\TEMA 3\Hibernate\src\main\java\com\billing\entity\ArticleCategory.java
+C:\Users\albag\Documents\2o\ACCESO DATOS\TEMA 3\Hibernate\src\main\java\com\billing\entity\ArticleFamily.java
+C:\Users\albag\Documents\2o\ACCESO DATOS\TEMA 3\Hibernate\src\main\java\com\billing\entity\Client.java
+C:\Users\albag\Documents\2o\ACCESO DATOS\TEMA 3\Hibernate\src\main\java\com\billing\entity\PaymentMethod.java
+C:\Users\albag\Documents\2o\ACCESO DATOS\TEMA 3\Hibernate\src\main\java\com\billing\entity\SpanishProvince.java
+C:\Users\albag\Documents\2o\ACCESO DATOS\TEMA 3\Hibernate\src\main\java\com\billing\entity\Supplier.java
+C:\Users\albag\Documents\2o\ACCESO DATOS\TEMA 3\Hibernate\src\main\java\com\billing\entity\Unit.java
+C:\Users\albag\Documents\2o\ACCESO DATOS\TEMA 3\Hibernate\src\main\java\com\billing\gui\ArticleDetailsDialog.java
+C:\Users\albag\Documents\2o\ACCESO DATOS\TEMA 3\Hibernate\src\main\java\com\billing\gui\ArticleFormDialog.java
+C:\Users\albag\Documents\2o\ACCESO DATOS\TEMA 3\Hibernate\src\main\java\com\billing\gui\ArticleManagementPanel.java
+C:\Users\albag\Documents\2o\ACCESO DATOS\TEMA 3\Hibernate\src\main\java\com\billing\gui\BaseDetailsDialog.java
+C:\Users\albag\Documents\2o\ACCESO DATOS\TEMA 3\Hibernate\src\main\java\com\billing\gui\BaseFormDialog.java
+C:\Users\albag\Documents\2o\ACCESO DATOS\TEMA 3\Hibernate\src\main\java\com\billing\gui\ClientDetailsDialog.java
+C:\Users\albag\Documents\2o\ACCESO DATOS\TEMA 3\Hibernate\src\main\java\com\billing\gui\ClientFormDialog.java
+C:\Users\albag\Documents\2o\ACCESO DATOS\TEMA 3\Hibernate\src\main\java\com\billing\gui\ClientManagementPanel.java
+C:\Users\albag\Documents\2o\ACCESO DATOS\TEMA 3\Hibernate\src\main\java\com\billing\gui\MainWindow.java
+C:\Users\albag\Documents\2o\ACCESO DATOS\TEMA 3\Hibernate\src\main\java\com\billing\gui\UIConstants.java
+C:\Users\albag\Documents\2o\ACCESO DATOS\TEMA 3\Hibernate\src\main\java\com\billing\main\MainApplication.java
+C:\Users\albag\Documents\2o\ACCESO DATOS\TEMA 3\Hibernate\src\main\java\com\billing\service\ArticleService.java
+C:\Users\albag\Documents\2o\ACCESO DATOS\TEMA 3\Hibernate\src\main\java\com\billing\service\ClientService.java
+C:\Users\albag\Documents\2o\ACCESO DATOS\TEMA 3\Hibernate\src\main\java\com\billing\util\HibernateUtil.java
+C:\Users\albag\Documents\2o\ACCESO DATOS\TEMA 3\Hibernate\src\main\java\com\billing\util\SpanishValidationUtil.java

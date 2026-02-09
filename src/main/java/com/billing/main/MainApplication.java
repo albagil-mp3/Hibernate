@@ -1,6 +1,7 @@
 package com.billing.main;
 
 import java.awt.Font;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.JOptionPane;
@@ -19,6 +20,7 @@ public class MainApplication {
     private static final Logger logger = Logger.getLogger(MainApplication.class.getName());
     public static void main(String[] args) {
         try {
+            suppressHibernateLogs();
             // Set Look and Feel to system default
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
             
@@ -74,7 +76,7 @@ public class MainApplication {
                        
                        Please check:
                        \u2022 MySQL server is running
-                       \u2022 Database 'hibernate' exists
+                       \u2022 Database 'facturacio' exists
                        \u2022 Username and password are correct
                        \u2022 MySQL is listening on port 3306
                        
@@ -86,6 +88,13 @@ public class MainApplication {
         }
         
         JOptionPane.showMessageDialog(null, message, "Database Error", JOptionPane.WARNING_MESSAGE);
+    }
+
+    private static void suppressHibernateLogs() {
+        Logger.getLogger("org.hibernate").setLevel(Level.OFF);
+        Logger.getLogger("org.hibernate.SQL").setLevel(Level.OFF);
+        Logger.getLogger("org.hibernate.engine.jdbc.spi.SqlExceptionHelper").setLevel(Level.OFF);
+        Logger.getLogger("org.hibernate.engine.jdbc.connections.internal.DriverManagerConnectionProviderImpl").setLevel(Level.OFF);
     }
     
     /**

@@ -1,4 +1,4 @@
-package com.billing.gui;
+    package com.billing.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -23,31 +23,16 @@ import com.billing.entity.Client;
 /**
  * Dialog for displaying complete client details in a read-only format
  */
-public class ClientDetailsDialog extends JDialog {
-    
-    private final Client client;
+public class ClientDetailsDialog extends BaseDetailsDialog<Client> {
     
     public ClientDetailsDialog(Frame parent, Client client) {
-        super(parent, "Client Details", true);
-        this.client = client;
-        
-        initializeComponents();
-        setupLayout();
-        configureDialog();
+        super(parent, client, "Client Details - " + (client.getName() != null ? client.getName() : "Unknown"));
+        // entity field is set by base class constructor
     }
     
-    private void initializeComponents() {
-        // Set the dialog properties
-        setTitle("Client Details - " + (client.getName() != null ? client.getName() : "Unknown"));
-        setModal(true);
-        setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-        setResizable(true);
-    }
     
-    private void setupLayout() {
-        setLayout(new BorderLayout());
-        
-        // Main content panel
+    @Override
+    protected JPanel createContentPanel() {
         JPanel mainPanel = new JPanel(new BorderLayout());
         mainPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
         mainPanel.setBackground(UIConstants.MODULE_CLIENTS_BG);
@@ -72,15 +57,12 @@ public class ClientDetailsDialog extends JDialog {
         infoPanel.add(createPaymentInfoPanel());
         infoPanel.add(createObservationsPanel());
         
-        JScrollPane scrollPane = new JScrollPane(infoPanel);
-        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        scrollPane.setPreferredSize(new Dimension(600, 500));
-        // make scrolling more responsive
-        UIConstants.enhanceScroll(scrollPane);
-        mainPanel.add(scrollPane, BorderLayout.CENTER);
+        // Wrap in scroll pane within content
+        JPanel contentWrapper = new JPanel(new BorderLayout());
+        contentWrapper.setOpaque(false);
+        contentWrapper.add(infoPanel, BorderLayout.CENTER);
         
-        add(mainPanel, BorderLayout.CENTER);
+        return contentWrapper;
     }
     
     private JPanel createBasicInfoPanel() {
@@ -105,73 +87,84 @@ public class ClientDetailsDialog extends JDialog {
         idLabel.setForeground(new java.awt.Color(0x212121));
         panel.add(idLabel, gbc);
         gbc.gridx = 1;
-        JLabel idValue = new JLabel(client.getId() != null ? client.getId().toString() : "N/A");
+        JLabel idValue = new JLabel(((Client)entity).getId() != null ? ((Client)entity).getId().toString() : "N/A");
         idValue.setFont(valueFont);
         panel.add(idValue, gbc);
+
+        // Code
+        gbc.gridx = 0; gbc.gridy = 1;
+        JLabel codeLabel = new JLabel("Code:");
+        codeLabel.setFont(labelFont);
+        codeLabel.setForeground(new java.awt.Color(0x212121));
+        panel.add(codeLabel, gbc);
+        gbc.gridx = 1;
+        JLabel codeValue = new JLabel(((Client)entity).getCode() != null ? ((Client)entity).getCode() : "N/A");
+        codeValue.setFont(valueFont);
+        panel.add(codeValue, gbc);
         
         // Name
-        gbc.gridx = 0; gbc.gridy = 1;
+        gbc.gridx = 0; gbc.gridy = 2;
         JLabel nameLabel = new JLabel("Name:");
         nameLabel.setFont(labelFont);
         nameLabel.setForeground(new java.awt.Color(0x212121));
         panel.add(nameLabel, gbc);
         gbc.gridx = 1;
-        JLabel nameValue = new JLabel(client.getName() != null ? client.getName() : "N/A");
+        JLabel nameValue = new JLabel(((Client)entity).getName() != null ? ((Client)entity).getName() : "N/A");
         nameValue.setFont(valueFont);
         panel.add(nameValue, gbc);
         
         // DNI
-        gbc.gridx = 0; gbc.gridy = 2;
+        gbc.gridx = 0; gbc.gridy = 3;
         JLabel dniLabel = new JLabel("DNI:");
         dniLabel.setFont(labelFont);
         dniLabel.setForeground(new java.awt.Color(0x212121));
         panel.add(dniLabel, gbc);
         gbc.gridx = 1;
-        JLabel dniValue = new JLabel(client.getDni() != null ? client.getDni() : "N/A");
+        JLabel dniValue = new JLabel(((Client)entity).getDni() != null ? ((Client)entity).getDni() : "N/A");
         dniValue.setFont(valueFont);
         panel.add(dniValue, gbc);
         
         // Address
-        gbc.gridx = 0; gbc.gridy = 3;
+        gbc.gridx = 0; gbc.gridy = 4;
         JLabel addressLabel = new JLabel("Address:");
         addressLabel.setFont(labelFont);
         addressLabel.setForeground(new java.awt.Color(0x212121));
         panel.add(addressLabel, gbc);
         gbc.gridx = 1; gbc.gridwidth = 2; gbc.fill = GridBagConstraints.HORIZONTAL;
-        JLabel addressValue = new JLabel(client.getAddress() != null ? client.getAddress() : "N/A");
+        JLabel addressValue = new JLabel(((Client)entity).getAddress() != null ? ((Client)entity).getAddress() : "N/A");
         addressValue.setFont(valueFont);
         panel.add(addressValue, gbc);
         
         // City
-        gbc.gridx = 0; gbc.gridy = 4; gbc.gridwidth = 1; gbc.fill = GridBagConstraints.NONE;
+        gbc.gridx = 0; gbc.gridy = 5; gbc.gridwidth = 1; gbc.fill = GridBagConstraints.NONE;
         JLabel cityLabel = new JLabel("City:");
         cityLabel.setFont(labelFont);
         cityLabel.setForeground(new java.awt.Color(0x212121));
         panel.add(cityLabel, gbc);
         gbc.gridx = 1;
-        JLabel cityValue = new JLabel(client.getCity() != null ? client.getCity() : "N/A");
+        JLabel cityValue = new JLabel(((Client)entity).getCity() != null ? ((Client)entity).getCity() : "N/A");
         cityValue.setFont(valueFont);
         panel.add(cityValue, gbc);
         
         // Province
-        gbc.gridx = 0; gbc.gridy = 5;
+        gbc.gridx = 0; gbc.gridy = 6;
         JLabel provinceLabel = new JLabel("Province:");
         provinceLabel.setFont(labelFont);
         provinceLabel.setForeground(new java.awt.Color(0x212121));
         panel.add(provinceLabel, gbc);
         gbc.gridx = 1;
-        JLabel provinceValue = new JLabel(client.getProvince() != null ? client.getProvince().getDisplayName() : "N/A");
+        JLabel provinceValue = new JLabel(((Client)entity).getProvince() != null ? ((Client)entity).getProvince().getDisplayName() : "N/A");
         provinceValue.setFont(valueFont);
         panel.add(provinceValue, gbc);
         
         // Postal Code
-        gbc.gridx = 0; gbc.gridy = 6;
+        gbc.gridx = 0; gbc.gridy = 7;
         JLabel postalCodeLabel = new JLabel("Postal Code:");
         postalCodeLabel.setFont(labelFont);
         postalCodeLabel.setForeground(new java.awt.Color(0x212121));
         panel.add(postalCodeLabel, gbc);
         gbc.gridx = 1;
-        JLabel postalCodeValue = new JLabel(client.getPostalCode() != null ? client.getPostalCode() : "N/A");
+        JLabel postalCodeValue = new JLabel(((Client)entity).getPostalCode() != null ? ((Client)entity).getPostalCode() : "N/A");
         postalCodeValue.setFont(valueFont);
         panel.add(postalCodeValue, gbc);
         
@@ -200,7 +193,7 @@ public class ClientDetailsDialog extends JDialog {
         fixedPhoneLabel.setForeground(new java.awt.Color(0x212121));
         panel.add(fixedPhoneLabel, gbc);
         gbc.gridx = 1;
-        JLabel fixedPhoneValue = new JLabel(client.getFixedPhone() != null ? client.getFixedPhone() : "N/A");
+        JLabel fixedPhoneValue = new JLabel(((Client)entity).getFixedPhone() != null ? ((Client)entity).getFixedPhone() : "N/A");
         fixedPhoneValue.setFont(valueFont);
         panel.add(fixedPhoneValue, gbc);
         
@@ -211,7 +204,7 @@ public class ClientDetailsDialog extends JDialog {
         mobilePhoneLabel.setForeground(new java.awt.Color(0x212121));
         panel.add(mobilePhoneLabel, gbc);
         gbc.gridx = 1;
-        JLabel mobilePhoneValue = new JLabel(client.getMobilePhone() != null ? client.getMobilePhone() : "N/A");
+        JLabel mobilePhoneValue = new JLabel(((Client)entity).getMobilePhone() != null ? ((Client)entity).getMobilePhone() : "N/A");
         mobilePhoneValue.setFont(valueFont);
         panel.add(mobilePhoneValue, gbc);
         
@@ -222,7 +215,7 @@ public class ClientDetailsDialog extends JDialog {
         emailLabel.setForeground(new java.awt.Color(0x212121));
         panel.add(emailLabel, gbc);
         gbc.gridx = 1; gbc.gridwidth = 2; gbc.fill = GridBagConstraints.HORIZONTAL;
-        JLabel emailValue = new JLabel(client.getEmail() != null ? client.getEmail() : "N/A");
+        JLabel emailValue = new JLabel(((Client)entity).getEmail() != null ? ((Client)entity).getEmail() : "N/A");
         emailValue.setFont(valueFont);
         panel.add(emailValue, gbc);
         
@@ -233,7 +226,7 @@ public class ClientDetailsDialog extends JDialog {
         websiteLabel.setForeground(new java.awt.Color(0x212121));
         panel.add(websiteLabel, gbc);
         gbc.gridx = 1; gbc.gridwidth = 2; gbc.fill = GridBagConstraints.HORIZONTAL;
-        JLabel websiteValue = new JLabel(client.getWebsite() != null ? client.getWebsite() : "N/A");
+        JLabel websiteValue = new JLabel(((Client)entity).getWebsite() != null ? ((Client)entity).getWebsite() : "N/A");
         websiteValue.setFont(valueFont);
         panel.add(websiteValue, gbc);
         
@@ -262,7 +255,7 @@ public class ClientDetailsDialog extends JDialog {
         paymentMethodLabel.setForeground(new java.awt.Color(0x212121));
         panel.add(paymentMethodLabel, gbc);
         gbc.gridx = 1;
-        JLabel paymentMethodValue = new JLabel(client.getPaymentMethod() != null ? client.getPaymentMethod().toString() : "N/A");
+        JLabel paymentMethodValue = new JLabel(((Client)entity).getPaymentMethod() != null ? ((Client)entity).getPaymentMethod().toString() : "N/A");
         paymentMethodValue.setFont(valueFont);
         panel.add(paymentMethodValue, gbc);
         
@@ -273,7 +266,7 @@ public class ClientDetailsDialog extends JDialog {
         creditLimitLabel.setForeground(new java.awt.Color(0x212121));
         panel.add(creditLimitLabel, gbc);
         gbc.gridx = 1;
-        String creditLimitText = client.getCreditLimit() != null ? "€" + client.getCreditLimit().toString() : "€0.00";
+        String creditLimitText = ((Client)entity).getCreditLimit() != null ? "€" + ((Client)entity).getCreditLimit().toString() : "€0.00";
         JLabel creditLimitValue = new JLabel(creditLimitText);
         creditLimitValue.setFont(valueFont);
         panel.add(creditLimitValue, gbc);
@@ -285,7 +278,7 @@ public class ClientDetailsDialog extends JDialog {
         bankAccountLabel.setForeground(new java.awt.Color(0x212121));
         panel.add(bankAccountLabel, gbc);
         gbc.gridx = 1; gbc.gridwidth = 2; gbc.fill = GridBagConstraints.HORIZONTAL;
-        JLabel bankAccountValue = new JLabel(client.getBankAccountNumber() != null ? client.getBankAccountNumber() : "N/A");
+        JLabel bankAccountValue = new JLabel(((Client)entity).getBankAccountNumber() != null ? ((Client)entity).getBankAccountNumber() : "N/A");
         bankAccountValue.setFont(valueFont);
         panel.add(bankAccountValue, gbc);
         
@@ -296,11 +289,11 @@ public class ClientDetailsDialog extends JDialog {
         activeLabel.setForeground(new java.awt.Color(0x212121));
         panel.add(activeLabel, gbc);
         gbc.gridx = 1;
-        String activeText = client.getActive() != null ? (client.getActive() ? "Active" : "Inactive") : "Inactive";
+        String activeText = ((Client)entity).getActive() != null ? (((Client)entity).getActive() ? "Active" : "Inactive") : "Inactive";
         JLabel activeValue = new JLabel(activeText);
         activeValue.setFont(valueFont);
         // Set color based on status using accent palette
-            if (client.getActive() != null && client.getActive()) {
+            if (((Client)entity).getActive() != null && ((Client)entity).getActive()) {
             activeValue.setForeground(UIConstants.MODULE_CLIENTS_TEXT.darker());
         } else {
             activeValue.setForeground(UIConstants.MODULE_CLIENTS_TEXT.darker());
@@ -324,7 +317,7 @@ public class ClientDetailsDialog extends JDialog {
         observationsArea.setBackground(getBackground());
         observationsArea.setLineWrap(true);
         observationsArea.setWrapStyleWord(true);
-        observationsArea.setText(client.getObservations() != null ? client.getObservations() : "No observations");
+        observationsArea.setText(((Client)entity).getObservations() != null ? ((Client)entity).getObservations() : "No observations");
         
         JScrollPane scrollPane = new JScrollPane(observationsArea);
         scrollPane.setPreferredSize(new Dimension(0, 80));
@@ -336,11 +329,9 @@ public class ClientDetailsDialog extends JDialog {
         return panel;
     }
     
-    private void configureDialog() {
+    @Override
+    protected void configureDialog() {
+        super.configureDialog();
         getContentPane().setBackground(UIConstants.MODULE_CLIENTS_BG);
-        setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-        setResizable(true);
-        pack();
-        setLocationRelativeTo(getParent());
     }
 }
