@@ -20,6 +20,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
@@ -34,11 +35,9 @@ import com.billing.service.ClientService;
  * Dialog for creating and editing client information
  * Provides comprehensive form with validation for all client fields
  */
-public class ClientFormDialog extends JDialog {
+public class ClientFormDialog extends BaseFormDialog<Client> {
     
     private final ClientService clientService;
-    private Client client;
-    private boolean confirmed = false;
     
     // Form fields
     private JTextField nameField;
@@ -59,13 +58,18 @@ public class ClientFormDialog extends JDialog {
     
     public ClientFormDialog(Frame parent, String title, Client client, ClientService clientService) {
         super(parent, title, true);
-        this.client = client;
+        this.entity = client;
         this.clientService = clientService;
         
         initializeComponents();
         setupLayout();
+        setupFormLayout();
         setupEventHandlers();
-        populateFields();
+        
+        if (client != null) {
+            populateFields();
+        }
+        
         configureDialog();
     }
     
@@ -127,56 +131,27 @@ public class ClientFormDialog extends JDialog {
     }
     
     private void setupLayout() {
-        setLayout(new BorderLayout());
+        getContentPane().setBackground(UIConstants.MODULE_CLIENTS_BG);
+    }
+    
+    @Override
+    protected java.awt.Component createFormPanel() {
+        // Main panel with tabs
+        JTabbedPane tabbedPane = new JTabbedPane();
+        tabbedPane.setFont(UIConstants.DEFAULT_FONT);
+        tabbedPane.setBackground(UIConstants.MODULE_CLIENTS_BG);
+        tabbedPane.setFocusable(false);
         
-        // Main content panel
-        JPanel mainPanel = new JPanel(new BorderLayout());
-        mainPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
-        mainPanel.setBackground(UIConstants.MODULE_CLIENTS_BG);
+        // Basic information tab
+        tabbedPane.addTab("Basic Information", createBasicInfoPanel());
         
-        // Title / header area
-        JLabel titleLabel = new JLabel(getTitle(), SwingConstants.CENTER);
-        titleLabel.setFont(UIConstants.TITLE_FONT);
-        titleLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
-        titleLabel.setForeground(UIConstants.MODULE_CLIENTS_ICON);
-        JPanel header = new JPanel(new BorderLayout());
-        header.setOpaque(false);
-        header.add(titleLabel, BorderLayout.CENTER);
-        mainPanel.add(header, BorderLayout.NORTH);
+        // Contact information tab
+        tabbedPane.addTab("Contact Information", createContactInfoPanel());
         
-        // Create form sections
-        JPanel formPanel = new JPanel(new GridLayout(3, 1, 0, 10));
-        formPanel.setOpaque(false);
+        // Payment information tab
+        tabbedPane.addTab("Payment & Observations", createPaymentObservationsPanel());
         
-        formPanel.add(createBasicInfoPanel());
-        formPanel.add(createContactInfoPanel());
-        formPanel.add(createPaymentInfoPanel());
-        
-        mainPanel.add(formPanel, BorderLayout.CENTER);
-        
-        // Observations panel
-        JPanel observationsPanel = createObservationsPanel();
-        mainPanel.add(observationsPanel, BorderLayout.SOUTH);
-        
-        // Wrap main content in a scroll pane so dialog can be resized and scrolled when needed
-        JScrollPane contentScroll = new JScrollPane(mainPanel,
-            JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-            JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        contentScroll.setBorder(null);
-        contentScroll.setPreferredSize(new Dimension(800, 600)); // default size
-        UIConstants.enhanceScroll(contentScroll);
-        add(contentScroll, BorderLayout.CENTER);
-        
-        // Required-note placed just above buttons and button panel in dialog south
-        JPanel southWrapper = new JPanel(new BorderLayout());
-        southWrapper.setOpaque(false);
-        JLabel requiredNote = new JLabel("Los campos marcados con * son obligatorios", SwingConstants.CENTER);
-        requiredNote.setFont(UIConstants.UI_FONT.deriveFont(Font.ITALIC, 12f));
-        requiredNote.setForeground(UIConstants.MODULE_CLIENTS_TEXT);
-        requiredNote.setBorder(BorderFactory.createEmptyBorder(6, 0, 6, 0));
-        southWrapper.add(requiredNote, BorderLayout.NORTH);
-        southWrapper.add(createButtonPanel(), BorderLayout.SOUTH);
-        add(southWrapper, BorderLayout.SOUTH);
+        return tabbedPane;
     }
     
     private JPanel createBasicInfoPanel() {
@@ -343,6 +318,22 @@ public class ClientFormDialog extends JDialog {
         return panel;
     }
     
+    private JPanel createPaymentObservationsPanel() {
+        JPanel panel = new JPanel(new BorderLayout(0, 10));
+        panel.setBackground(UIConstants.MODULE_CLIENTS_BG);
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        
+        // Payment information
+        JPanel paymentPanel = createPaymentInfoPanel();
+        panel.add(paymentPanel, BorderLayout.NORTH);
+        
+        // Observations panel
+        JPanel observationsPanel = createObservationsPanel();
+        panel.add(observationsPanel, BorderLayout.CENTER);
+        
+        return panel;
+    }
+    
     private JPanel createObservationsPanel() {
         JPanel panel = new JPanel(new BorderLayout());
         TitledBorder border = BorderFactory.createTitledBorder("Observations");
@@ -352,33 +343,15 @@ public class ClientFormDialog extends JDialog {
         panel.setBackground(UIConstants.MODULE_CLIENTS_BG);
         
         JScrollPane scrollPane = new JScrollPane(observationsArea);
-        scrollPane.setPreferredSize(new Dimension(0, 80));
+        scrollPane.setPreferredSize(new Dimension(0, 120));
         UIConstants.enhanceScroll(scrollPane);
         panel.add(scrollPane, BorderLayout.CENTER);
         
         return panel;
     }
     
-    private JPanel createButtonPanel() {
-        JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 8, 5));
-        panel.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
-        panel.setBackground(UIConstants.MODULE_CLIENTS_BG);
-
-        JButton saveButton = UIConstants.createSuccessButton("SAVE", null);
-        JButton cancelButton = UIConstants.createDangerButton("CANCEL", null);
-
-        // add listeners directly
-        saveButton.addActionListener(e -> saveClient());
-        cancelButton.addActionListener(e -> cancelDialog());
-
-        panel.add(cancelButton);
-        panel.add(saveButton);
-
-        return panel;
-    }
-    
     private void setupEventHandlers() {
-        // Save/Cancel listeners are attached directly in createButtonPanel()
+        // Base class buttons handle Save/Cancel
         // Auto-fill province based on postal code
         postalCodeField.addFocusListener(new java.awt.event.FocusAdapter() {
             @Override
@@ -394,41 +367,8 @@ public class ClientFormDialog extends JDialog {
         });
     }
     
-    private void populateFields() {
-        if (client != null) {
-            nameField.setText(client.getName());
-            dniField.setText(client.getDni());
-            addressField.setText(client.getAddress());
-            cityField.setText(client.getCity());
-            
-            if (client.getProvince() != null) {
-                provinceComboBox.setSelectedItem(client.getProvince());
-            }
-            
-            postalCodeField.setText(client.getPostalCode());
-            fixedPhoneField.setText(client.getFixedPhone());
-            mobilePhoneField.setText(client.getMobilePhone());
-            emailField.setText(client.getEmail());
-            websiteField.setText(client.getWebsite());
-            
-            if (client.getPaymentMethod() != null) {
-                paymentMethodComboBox.setSelectedItem(client.getPaymentMethod());
-            }
-            
-            if (client.getCreditLimit() != null) {
-                creditLimitField.setText(client.getCreditLimit().toString());
-            }
-            
-            bankAccountField.setText(client.getBankAccountNumber());
-            Boolean active = client.getActive();
-            activeCheckBox.setSelected(active != null ? active : true);
-            observationsArea.setText(client.getObservations());
-        }
-    }
-    
     private void configureDialog() {
         getContentPane().setBackground(UIConstants.MODULE_CLIENTS_BG);
-        setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
         // allow resizing and sensible minimum size; center relative to parent
         setResizable(true);
         pack();
@@ -436,91 +376,122 @@ public class ClientFormDialog extends JDialog {
         setLocationRelativeTo(getParent());
     }
     
-    private void saveClient() {
+    @Override
+    protected void populateFields() {
+        if (entity == null) return;
+        
+        nameField.setText(entity.getName());
+        dniField.setText(entity.getDni());
+        addressField.setText(entity.getAddress());
+        cityField.setText(entity.getCity());
+        provinceComboBox.setSelectedItem(entity.getProvince());
+        
+        postalCodeField.setText(entity.getPostalCode() != null ? entity.getPostalCode() : "");
+        fixedPhoneField.setText(entity.getFixedPhone() != null ? entity.getFixedPhone() : "");
+        mobilePhoneField.setText(entity.getMobilePhone() != null ? entity.getMobilePhone() : "");
+        emailField.setText(entity.getEmail() != null ? entity.getEmail() : "");
+        websiteField.setText(entity.getWebsite() != null ? entity.getWebsite() : "");
+        
+        paymentMethodComboBox.setSelectedItem(entity.getPaymentMethod());
+        
+        creditLimitField.setText(entity.getCreditLimit() != null ? entity.getCreditLimit().toString() : "");
+        bankAccountField.setText(entity.getBankAccountNumber() != null ? entity.getBankAccountNumber() : "");
+        
+        Boolean active = ((Client)entity).getActive();
+        activeCheckBox.setSelected(active != null ? active : true);
+        observationsArea.setText(entity.getObservations() != null ? entity.getObservations() : "");
+    }
+    
+    @Override
+    protected boolean validateForm() {
+        // Validate required fields
+        if (nameField.getText().trim().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Name is required.", "Validation Error", JOptionPane.ERROR_MESSAGE);
+            nameField.requestFocus();
+            return false;
+        }
+        
+        if (dniField.getText().trim().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "DNI is required.", "Validation Error", JOptionPane.ERROR_MESSAGE);
+            dniField.requestFocus();
+            return false;
+        }
+        
+        if (addressField.getText().trim().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Address is required.", "Validation Error", JOptionPane.ERROR_MESSAGE);
+            addressField.requestFocus();
+            return false;
+        }
+        
+        if (cityField.getText().trim().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "City is required.", "Validation Error", JOptionPane.ERROR_MESSAGE);
+            cityField.requestFocus();
+            return false;
+        }
+        
+        return true;
+    }
+    
+    @Override
+    protected boolean saveEntity() {
         try {
-            // Validate required fields
-            if (nameField.getText().trim().isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Name is required.", "Validation Error", JOptionPane.ERROR_MESSAGE);
-                nameField.requestFocus();
-                return;
-            }
-            
-            if (dniField.getText().trim().isEmpty()) {
-                JOptionPane.showMessageDialog(this, "DNI is required.", "Validation Error", JOptionPane.ERROR_MESSAGE);
-                dniField.requestFocus();
-                return;
-            }
-            
-            if (addressField.getText().trim().isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Address is required.", "Validation Error", JOptionPane.ERROR_MESSAGE);
-                addressField.requestFocus();
-                return;
-            }
-            
-            if (cityField.getText().trim().isEmpty()) {
-                JOptionPane.showMessageDialog(this, "City is required.", "Validation Error", JOptionPane.ERROR_MESSAGE);
-                cityField.requestFocus();
-                return;
-            }
-            
             // Create or update client
-            if (client == null) {
-                client = new Client();
+            if (entity == null) {
+                entity = new Client();
             }
             
-            client.setName(nameField.getText().trim());
-            client.setDni(dniField.getText().trim().toUpperCase());
-            client.setAddress(addressField.getText().trim());
-            client.setCity(cityField.getText().trim());
-            client.setProvince((SpanishProvince) provinceComboBox.getSelectedItem());
+            entity.setName(nameField.getText().trim());
+            entity.setDni(dniField.getText().trim().toUpperCase());
+            entity.setAddress(addressField.getText().trim());
+            entity.setCity(cityField.getText().trim());
+            entity.setProvince((SpanishProvince) provinceComboBox.getSelectedItem());
             
             String postalCode = postalCodeField.getText().trim();
-            client.setPostalCode(postalCode.isEmpty() ? null : postalCode);
+            entity.setPostalCode(postalCode.isEmpty() ? null : postalCode);
             
             String fixedPhone = fixedPhoneField.getText().trim();
-            client.setFixedPhone(fixedPhone.isEmpty() ? null : fixedPhone);
+            entity.setFixedPhone(fixedPhone.isEmpty() ? null : fixedPhone);
             
             String mobilePhone = mobilePhoneField.getText().trim();
-            client.setMobilePhone(mobilePhone.isEmpty() ? null : mobilePhone);
+            entity.setMobilePhone(mobilePhone.isEmpty() ? null : mobilePhone);
             
             String email = emailField.getText().trim();
-            client.setEmail(email.isEmpty() ? null : email);
+            entity.setEmail(email.isEmpty() ? null : email);
             
             String website = websiteField.getText().trim();
-            client.setWebsite(website.isEmpty() ? null : website);
+            entity.setWebsite(website.isEmpty() ? null : website);
             
-            client.setPaymentMethod((PaymentMethod) paymentMethodComboBox.getSelectedItem());
+            entity.setPaymentMethod((PaymentMethod) paymentMethodComboBox.getSelectedItem());
             
             try {
                 String creditLimitText = creditLimitField.getText().trim();
                 if (!creditLimitText.isEmpty()) {
-                    client.setCreditLimit(new BigDecimal(creditLimitText));
+                    entity.setCreditLimit(new BigDecimal(creditLimitText));
                 }
             } catch (NumberFormatException e) {
                 JOptionPane.showMessageDialog(this, "Invalid credit limit format.", "Validation Error", JOptionPane.ERROR_MESSAGE);
                 creditLimitField.requestFocus();
-                return;
+                return false;
             }
             
             String bankAccount = bankAccountField.getText().trim();
-            client.setBankAccountNumber(bankAccount.isEmpty() ? null : bankAccount);
+            entity.setBankAccountNumber(bankAccount.isEmpty() ? null : bankAccount);
             
-            client.setActive(activeCheckBox.isSelected());
+            entity.setActive(activeCheckBox.isSelected());
             
             String observations = observationsArea.getText().trim();
-            client.setObservations(observations.isEmpty() ? null : observations);
+            entity.setObservations(observations.isEmpty() ? null : observations);
             
             // Save client
-            if (client.getId() == null) {
-                clientService.createClient(client);
+            if (entity.getId() == null) {
+                clientService.createClient(entity);
                 JOptionPane.showMessageDialog(this, "Client created successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
             } else {
-                clientService.updateClient(client);
+                clientService.updateClient(entity);
                 JOptionPane.showMessageDialog(this, "Client updated successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
             }
             
-            confirmed = true;
-            dispose();
+            return true;
             
         } catch (IllegalArgumentException e) {
             // Validation or business rule failures
@@ -528,20 +499,14 @@ public class ClientFormDialog extends JDialog {
                 e.getMessage(),
                 "Validation Error",
                 JOptionPane.WARNING_MESSAGE);
+            return false;
         } catch (RuntimeException e) {
             // Persistence or unexpected runtime errors
             JOptionPane.showMessageDialog(this,
                 "Error saving client: " + e.getMessage(),
                 "Error",
                 JOptionPane.ERROR_MESSAGE);
+            return false;
         }
-    }
-    
-    private void cancelDialog() {
-        dispose();
-    }
-    
-    public boolean isConfirmed() {
-        return confirmed;
     }
 }

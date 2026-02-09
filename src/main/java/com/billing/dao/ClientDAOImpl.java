@@ -23,18 +23,19 @@ public class ClientDAOImpl implements ClientDAO {
     public ClientDAOImpl() {
         this.sessionFactory = HibernateUtil.getSessionFactory();
     }
+
+    private SessionFactory getSessionFactoryOrThrow() {
+        SessionFactory factory = sessionFactory != null ? sessionFactory : HibernateUtil.getSessionFactory();
+        if (factory == null || factory.isClosed()) {
+            throw new RuntimeException("Database is not available. Please check your MySQL connection.");
+        }
+        return factory;
+    }
     
     @Override
     public Client save(Client client) {
-        if (!HibernateUtil.isInitialized()) {
-            throw new RuntimeException("Database is not available. Please check your MySQL connection.");
-        }
-        if (sessionFactory == null || sessionFactory.isClosed()) {
-            throw new RuntimeException("Hibernate SessionFactory is closed or unavailable. Restart the application to reinitialize the database connection.");
-        }
-        
         Transaction transaction = null;
-        try (Session session = sessionFactory.openSession()) {
+        try (Session session = getSessionFactoryOrThrow().openSession()) {
             transaction = session.beginTransaction();
             session.save(client);
             transaction.commit();
@@ -51,7 +52,7 @@ public class ClientDAOImpl implements ClientDAO {
     
     @Override
     public Client findById(Integer id) {
-        try (Session session = sessionFactory.openSession()) {
+        try (Session session = getSessionFactoryOrThrow().openSession()) {
             return session.get(Client.class, id);
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error finding client by ID: " + id, e);
@@ -61,7 +62,7 @@ public class ClientDAOImpl implements ClientDAO {
     
     @Override
     public List<Client> findAll() {
-        try (Session session = sessionFactory.openSession()) {
+        try (Session session = getSessionFactoryOrThrow().openSession()) {
             Query<Client> query = session.createQuery("FROM Client", Client.class);
             return query.list();
         } catch (Exception e) {
@@ -73,7 +74,7 @@ public class ClientDAOImpl implements ClientDAO {
     @Override
     public Client update(Client client) {
         Transaction transaction = null;
-        try (Session session = sessionFactory.openSession()) {
+        try (Session session = getSessionFactoryOrThrow().openSession()) {
             transaction = session.beginTransaction();
             session.update(client);
             transaction.commit();
@@ -91,7 +92,7 @@ public class ClientDAOImpl implements ClientDAO {
     @Override
     public void delete(Client client) {
         Transaction transaction = null;
-        try (Session session = sessionFactory.openSession()) {
+        try (Session session = getSessionFactoryOrThrow().openSession()) {
             transaction = session.beginTransaction();
             session.delete(client);
             transaction.commit();
@@ -120,7 +121,7 @@ public class ClientDAOImpl implements ClientDAO {
     
     @Override
     public long count() {
-        try (Session session = sessionFactory.openSession()) {
+        try (Session session = getSessionFactoryOrThrow().openSession()) {
             Query<Long> query = session.createQuery("SELECT COUNT(c) FROM Client c", Long.class);
             return query.uniqueResult();
         } catch (Exception e) {
@@ -131,7 +132,7 @@ public class ClientDAOImpl implements ClientDAO {
     
     @Override
     public Client findByDni(String dni) {
-        try (Session session = sessionFactory.openSession()) {
+        try (Session session = getSessionFactoryOrThrow().openSession()) {
             Query<Client> query = session.createQuery("FROM Client WHERE dni = :dni", Client.class);
             query.setParameter("dni", dni);
             return query.uniqueResult();
@@ -143,7 +144,7 @@ public class ClientDAOImpl implements ClientDAO {
     
     @Override
     public List<Client> findByName(String name) {
-        try (Session session = sessionFactory.openSession()) {
+        try (Session session = getSessionFactoryOrThrow().openSession()) {
             Query<Client> query = session.createQuery(
                 "FROM Client WHERE LOWER(name) LIKE LOWER(:name)", Client.class);
             query.setParameter("name", "%" + name + "%");
@@ -156,7 +157,7 @@ public class ClientDAOImpl implements ClientDAO {
     
     @Override
     public List<Client> findByPhone(String phone) {
-        try (Session session = sessionFactory.openSession()) {
+        try (Session session = getSessionFactoryOrThrow().openSession()) {
             Query<Client> query = session.createQuery(
                 "FROM Client WHERE fixedPhone = :phone OR mobilePhone = :phone", Client.class);
             query.setParameter("phone", phone);
@@ -169,7 +170,7 @@ public class ClientDAOImpl implements ClientDAO {
     
     @Override
     public List<Client> findByWebsite(String website) {
-        try (Session session = sessionFactory.openSession()) {
+        try (Session session = getSessionFactoryOrThrow().openSession()) {
             Query<Client> query = session.createQuery(
                 "FROM Client WHERE LOWER(website) LIKE LOWER(:website)", Client.class);
             query.setParameter("website", "%" + website + "%");
@@ -182,7 +183,7 @@ public class ClientDAOImpl implements ClientDAO {
     
     @Override
     public List<Client> findActiveClients() {
-        try (Session session = sessionFactory.openSession()) {
+        try (Session session = getSessionFactoryOrThrow().openSession()) {
             Query<Client> query = session.createQuery("FROM Client WHERE active = true", Client.class);
             return query.list();
         } catch (Exception e) {
@@ -193,7 +194,7 @@ public class ClientDAOImpl implements ClientDAO {
     
     @Override
     public List<Client> findInactiveClients() {
-        try (Session session = sessionFactory.openSession()) {
+        try (Session session = getSessionFactoryOrThrow().openSession()) {
             Query<Client> query = session.createQuery("FROM Client WHERE active = false", Client.class);
             return query.list();
         } catch (Exception e) {
@@ -204,7 +205,7 @@ public class ClientDAOImpl implements ClientDAO {
     
     @Override
     public List<Client> findAllOrderedById() {
-        try (Session session = sessionFactory.openSession()) {
+        try (Session session = getSessionFactoryOrThrow().openSession()) {
             Query<Client> query = session.createQuery("FROM Client ORDER BY id", Client.class);
             return query.list();
         } catch (Exception e) {
@@ -215,7 +216,7 @@ public class ClientDAOImpl implements ClientDAO {
     
     @Override
     public List<Client> findAllOrderedByDni() {
-        try (Session session = sessionFactory.openSession()) {
+        try (Session session = getSessionFactoryOrThrow().openSession()) {
             Query<Client> query = session.createQuery("FROM Client ORDER BY dni", Client.class);
             return query.list();
         } catch (Exception e) {
@@ -226,7 +227,7 @@ public class ClientDAOImpl implements ClientDAO {
     
     @Override
     public List<Client> findAllOrderedByName() {
-        try (Session session = sessionFactory.openSession()) {
+        try (Session session = getSessionFactoryOrThrow().openSession()) {
             Query<Client> query = session.createQuery("FROM Client ORDER BY name", Client.class);
             return query.list();
         } catch (Exception e) {
@@ -242,7 +243,7 @@ public class ClientDAOImpl implements ClientDAO {
     
     @Override
     public List<Client> searchClients(String searchTerm) {
-        try (Session session = sessionFactory.openSession()) {
+        try (Session session = getSessionFactoryOrThrow().openSession()) {
             Query<Client> query = session.createQuery(
                 "FROM Client WHERE " +
                 "LOWER(name) LIKE LOWER(:term) OR " +
@@ -255,6 +256,27 @@ public class ClientDAOImpl implements ClientDAO {
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error searching clients with term: " + searchTerm, e);
             throw new RuntimeException("Error searching clients", e);
+        }
+    }
+
+    @Override
+    public void updateCode(Integer id, String code) {
+        Transaction transaction = null;
+        try (Session session = getSessionFactoryOrThrow().openSession()) {
+            transaction = session.beginTransaction();
+            // Use native query to avoid Hibernate property insertable/updatable restrictions
+            Query<?> query = session.createNativeQuery("UPDATE clients SET code = :code WHERE id = :id");
+            query.setParameter("code", code);
+            query.setParameter("id", id);
+            query.executeUpdate();
+            transaction.commit();
+            logger.info(() -> "Updated client code for ID: " + id + " -> " + code);
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            logger.log(Level.SEVERE, "Error updating client code for ID: " + id, e);
+            throw new RuntimeException("Error updating client code", e);
         }
     }
 }

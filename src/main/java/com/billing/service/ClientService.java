@@ -69,7 +69,17 @@ public class ClientService {
         client.setDni(SpanishValidationUtil.formatDNI(client.getDni()));
         
         logger.info(() -> "Creating new client: " + client.getName());
-        return clientDAO.save(client);
+        // Save client first to obtain generated ID
+        Client saved = clientDAO.save(client);
+        if (saved != null && saved.getId() != null) {
+            Integer id = saved.getId();
+            String generatedCode = String.format("CLI%03d", id);
+            // Persist the generated code directly via DAO to avoid DB trigger constraints
+            clientDAO.updateCode(id, generatedCode);
+            // Refresh entity state
+            saved = clientDAO.findById(id);
+        }
+        return saved;
     }
     
     /**

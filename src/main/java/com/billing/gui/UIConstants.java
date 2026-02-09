@@ -77,6 +77,10 @@ public final class UIConstants {
     // Common fonts
     public static final Font UI_FONT = new Font("Calibri", Font.PLAIN, 12);
     public static final Font TITLE_FONT = new Font("Calibri", Font.BOLD, 18);
+    
+    // Font aliases for compatibility
+    public static final Font DEFAULT_FONT = UI_FONT;
+    public static final Font BUTTON_FONT = new Font("Calibri", Font.BOLD, 12);
 
     // Global button size (uniform for all button types)
     public static final java.awt.Dimension BUTTON_SIZE = new Dimension(160, 40);

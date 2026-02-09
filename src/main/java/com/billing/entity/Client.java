@@ -1,5 +1,6 @@
 package com.billing.entity;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Objects;
 
@@ -22,20 +23,23 @@ import jakarta.validation.constraints.Size;
 
 /**
  * Client entity representing customers in the billing system
- * Corresponds to 'clientes' table in 'facturacion' database
+ * Corresponds to 'clients' table in 'facturacio' database
  */
 @Entity
-@Table(name = "clientes")
-public class Client {
+@Table(name = "clients")
+public class Client implements Serializable {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Integer id;
+
+    @Column(name = "code", insertable = false, updatable = false)
+    private String code;
     
     @NotNull(message = "Name cannot be null")
     @Size(max = 50, message = "Name must not exceed 50 characters")
-    @Column(name = "nom", nullable = false, length = 50)
+    @Column(name = "name", nullable = false, length = 50)
     private String name;
     
     @NotNull(message = "DNI cannot be null")
@@ -46,64 +50,64 @@ public class Client {
     
     @NotNull(message = "Address cannot be null")
     @Size(max = 50, message = "Address must not exceed 50 characters")
-    @Column(name = "direccio", nullable = false, length = 50)
+    @Column(name = "address", nullable = false, length = 50)
     private String address;
     
     @NotNull(message = "City cannot be null")
     @Size(max = 30, message = "City must not exceed 30 characters")
-    @Column(name = "poblacio", nullable = false, length = 30)
+    @Column(name = "city", nullable = false, length = 30)
     private String city;
     
     @NotNull(message = "Province cannot be null")
     @Enumerated(EnumType.STRING)
-    @Column(name = "provincia", nullable = false)
+    @Column(name = "province", nullable = false)
     private SpanishProvince province;
     
     @Pattern(regexp = "^[0-9]{5}$", message = "Postal code must be 5 digits")
-    @Column(name = "codi_postal", length = 5)
+    @Column(name = "postal_code", length = 5)
     private String postalCode;
     
     @Pattern(regexp = "^[0-9]{9}$", message = "Fixed phone must be 9 digits")
-    @Column(name = "telefon_fixe", length = 9)
+    @Column(name = "landline_phone", length = 9)
     private String fixedPhone;
     
     @Pattern(regexp = "^[0-9]{9}$", message = "Mobile phone must be 9 digits")
-    @Column(name = "telefon_mobil", length = 9)
+    @Column(name = "mobile_phone", length = 9)
     private String mobilePhone;
     
     @Email(message = "Invalid email format")
     @Size(max = 80, message = "Email must not exceed 80 characters")
-    @Column(name = "correu_electronic", length = 80)
+    @Column(name = "email", length = 80)
     private String email;
     
     @Size(max = 50, message = "Website must not exceed 50 characters")
-    @Column(name = "plana_web", length = 50)
+    @Column(name = "website", length = 50)
     private String website;
     
     @NotNull(message = "Payment method cannot be null")
     @Enumerated(EnumType.STRING)
-    @Column(name = "forma_pagament", nullable = false)
+    @Column(name = "payment_method", nullable = false)
     private PaymentMethod paymentMethod;
     
     @DecimalMin(value = "0.00", message = "Credit limit must be at least 0.00")
     @DecimalMax(value = "1000000.00", message = "Credit limit must not exceed 1,000,000.00")
-    @Column(name = "limit_credit", precision = 10, scale = 2)
+    @Column(name = "credit_limit", precision = 10, scale = 2)
     private BigDecimal creditLimit;
     
     @Size(max = 34, message = "Bank account number must not exceed 34 characters (IBAN format)")
     @Pattern(regexp = "^ES[0-9]{22}$", message = "Bank account must be a valid Spanish IBAN (ES followed by 22 digits)")
-    @Column(name = "numero_conta_bancari", length = 34)
+    @Column(name = "bank_account_number", length = 34)
     private String bankAccountNumber;
     
-    @Column(name = "actiu", nullable = false)
+    @Column(name = "active", nullable = false)
     private Boolean active = true;
     
     @Size(max = 500, message = "Observations must not exceed 500 characters")
-    @Column(name = "observacions", length = 500)
+    @Column(name = "observations", length = 500)
     private String observations;
     
     @Lob
-    @Column(name = "imatge")
+    @Column(name = "image")
     private byte[] image;
     
     // Constructors
@@ -130,6 +134,10 @@ public class Client {
     
     public void setId(Integer id) {
         this.id = id;
+    }
+
+    public String getCode() {
+        return code;
     }
     
     public String getName() {

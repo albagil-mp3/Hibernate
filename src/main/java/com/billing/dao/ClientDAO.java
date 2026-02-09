@@ -80,4 +80,11 @@ public interface ClientDAO extends GenericDAO<Client, Integer> {
      * @return List of clients matching the search criteria
      */
     List<Client> searchClients(String searchTerm);
+
+    /**
+     * Update the code field for a client by id. Used when the code is generated after insert.
+     * @param id Client id
+     * @param code Generated code to set
+     */
+    void updateCode(Integer id, String code);
 }

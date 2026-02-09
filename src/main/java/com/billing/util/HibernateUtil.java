@@ -1,5 +1,6 @@
 package com.billing.util;
 
+import java.net.URL;
 import java.util.logging.Logger;
 
 import org.hibernate.HibernateException;
@@ -41,21 +42,31 @@ public class HibernateUtil {
         try {
             String configFile = getConfigurationFile();
             logger.info(() -> "Initializing Hibernate SessionFactory with " + configFile + "...");
-            // Create the SessionFactory from appropriate configuration file
+            
+            // Try to load the configuration file explicitly
+            URL configURL = HibernateUtil.class.getClassLoader().getResource(configFile);
+            if (configURL == null) {
+                throw new RuntimeException("Configuration file '" + configFile + "' not found in classpath");
+            }
+            logger.info(() -> "Configuration file found at: " + configURL.toExternalForm());
+            
+            // Create the SessionFactory from configuration file
             sessionFactory = new Configuration().configure(configFile).buildSessionFactory();
+            initializationError = null;
+            initialized = true;
             logger.info("Hibernate SessionFactory initialized successfully for MySQL database");
         } catch (HibernateException ex) {
             // Specific Hibernate-related errors
             logger.severe(() -> "Hibernate error during SessionFactory creation: " + ex.getMessage());
             initializationError = ex;
             sessionFactory = null;
+            initialized = false;
         } catch (RuntimeException ex) {
             // Other runtime problems (config file missing, classpath issues, etc.)
             logger.severe(() -> "Runtime error during SessionFactory creation: " + ex.getMessage());
             initializationError = ex;
             sessionFactory = null;
-        } finally {
-            initialized = true;
+            initialized = false;
         }
     }
     
@@ -72,7 +83,7 @@ public class HibernateUtil {
      * @return true if SessionFactory is available
      */
     public static boolean isInitialized() {
-        return initialized && sessionFactory != null;
+        return sessionFactory != null;
     }
     
     /**

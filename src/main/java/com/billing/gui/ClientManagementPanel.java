@@ -57,7 +57,7 @@ public class ClientManagementPanel extends JPanel {
     
     // Column names for the table
     private final String[] columnNames = {
-        "ID", "Name", "DNI", "Address", "City", "Province", 
+        "ID", "Code", "Name", "DNI", "Address", "City", "Province", 
         "Postal Code", "Fixed Phone", "Mobile Phone", "Email", 
         "Website", "Payment Method", "Credit Limit", "Active"
     };
@@ -81,9 +81,8 @@ public class ClientManagementPanel extends JPanel {
         sortComboBox.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         
         // Initialize Add and Refresh buttons using module palette
-        addButton = UIConstants.createPrimaryButton("ADD CLIENT",
+        addButton = UIConstants.createSuccessButton("ADD",
             UIConstants.loadIcon("/icons/add.png", 16));
-        addButton.setBackground(UIConstants.MODULE_CLIENTS_ICON);
         addButton.setForeground(Color.WHITE);
 
         refreshButton = UIConstants.createSecondaryButton("REFRESH",
@@ -102,8 +101,8 @@ public class ClientManagementPanel extends JPanel {
                 // Ensure proper class types for each column
                 return switch (columnIndex) {
                     case 0 -> Integer.class;        // ID
-                    case 12 -> BigDecimal.class;    // Credit Limit
-                    case 13 -> String.class;        // Active (Yes/No)
+                    case 13 -> BigDecimal.class;    // Credit Limit
+                    case 14 -> String.class;        // Active (Yes/No)
                     default -> String.class;        // All other columns are String
                 }; 
             }
@@ -179,7 +178,7 @@ public class ClientManagementPanel extends JPanel {
     }
     
     private void setColumnWidths() {
-        int[] columnWidths = {50, 150, 80, 200, 120, 100, 80, 90, 90, 200, 150, 100, 100, 60};
+        int[] columnWidths = {50, 90, 150, 80, 200, 120, 100, 80, 90, 90, 200, 150, 100, 100, 60};
         
         for (int i = 0; i < columnWidths.length && i < clientTable.getColumnCount(); i++) {
             clientTable.getColumnModel().getColumn(i).setPreferredWidth(columnWidths[i]);
@@ -268,10 +267,15 @@ public class ClientManagementPanel extends JPanel {
         
         viewButton = UIConstants.createSecondaryButton("DETAILS",
             UIConstants.loadIcon("/icons/details.png", 16));
+        viewButton.setForeground(Color.WHITE);
+        
         editButton = UIConstants.createPrimaryButton("EDIT",
             UIConstants.loadIcon("/icons/edit.png", 16));
+        editButton.setForeground(Color.WHITE);
+        
         deleteButton = UIConstants.createDangerButton("DELETE",
             UIConstants.loadIcon("/icons/delete.png", 16));
+        deleteButton.setForeground(Color.WHITE);
 
         bottomPanel.add(viewButton);
         bottomPanel.add(editButton);
@@ -335,6 +339,7 @@ public class ClientManagementPanel extends JPanel {
         for (Client client : clients) {
             Object[] rowData = {
                 client.getId(),
+                client.getCode() != null ? client.getCode() : "",
                 client.getName(),
                 client.getDni(),
                 client.getAddress(),
@@ -486,7 +491,7 @@ public class ClientManagementPanel extends JPanel {
         try {
             int modelRow = clientTable.convertRowIndexToModel(selectedRow);
             Integer clientId = (Integer) tableModel.getValueAt(modelRow, 0);
-            String clientName = (String) tableModel.getValueAt(modelRow, 1);
+            String clientName = (String) tableModel.getValueAt(modelRow, 2);
             
             int option = JOptionPane.showConfirmDialog(this,
                 "Are you sure you want to delete client '" + clientName + "'?\n" +
