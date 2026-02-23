@@ -1,0 +1,37 @@
+%%{init: { 'theme': 'base', 'themeVariables': { 'primaryColor': '#7B1FA2', 'edgeLabelBackground':'#ffffff' }}}%%
+erDiagram
+    CLIENT {
+        INT id PK
+        string code
+        string name
+        string dni
+        string address
+    }
+    ITEM {
+        INT id PK
+        string code
+        string name
+        decimal price
+    }
+    DELIVERY_NOTE {
+        INT id PK
+        string code
+        datetime created_at
+    }
+    DELIVERY_LINE {
+        INT id PK
+        INT quantity
+        decimal unit_price
+    }
+    INVOICE {
+        INT id PK
+        string code
+        datetime created_at
+        decimal total
+    }
+
+    CLIENT ||--o{ DELIVERY_NOTE : has
+    CLIENT ||--o{ INVOICE : billed
+    DELIVERY_NOTE ||--o{ DELIVERY_LINE : contains
+    INVOICE ||--o{ DELIVERY_LINE : contains
+    ITEM ||--o{ DELIVERY_LINE : referenced

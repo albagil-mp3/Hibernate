@@ -3,6 +3,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "MainApplication",
+            "request": "launch",
+            "mainClass": "com.billing.main.MainApplication",
+            "projectName": "hibernate-billing-system"
+        },
+        {
+            "type": "java",
             "name": "Run MainApplication",
             "request": "launch",
             "mainClass": "com.billing.main.MainApplication",

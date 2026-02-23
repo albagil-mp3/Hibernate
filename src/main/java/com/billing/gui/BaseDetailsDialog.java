@@ -2,16 +2,17 @@ package com.billing.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.Frame;
-import java.awt.GridBagLayout;
+import java.awt.Graphics2D;
+import java.awt.print.PrinterException;
+import java.awt.print.PrinterJob;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.SwingConstants;
+import javax.swing.JComponent;
 
 /**
  * Abstract base class for details dialogs (read-only view)
@@ -21,6 +22,7 @@ public abstract class BaseDetailsDialog<T> extends JDialog {
     
     protected T entity;
     protected JButton printButton;
+    private JComponent printTarget;
     
     public BaseDetailsDialog(Frame parent, T entity, String title) {
         super(getNullSafeParent(parent), title, true);
@@ -72,6 +74,7 @@ public abstract class BaseDetailsDialog<T> extends JDialog {
         
         // Main content panel (to be populated by subclasses)
         JPanel contentPanel = createContentPanel();
+        printTarget = contentPanel;
         
         // Scroll pane for vertical scrolling
         JScrollPane scrollPane = new JScrollPane(contentPanel);
@@ -118,7 +121,34 @@ public abstract class BaseDetailsDialog<T> extends JDialog {
      * Subclasses can override to implement custom printing logic
      */
     protected void handlePrint() {
-        // Default implementation - subclasses can override
+        if (printTarget == null) {
+            return;
+        }
+        try {
+            PrinterJob job = PrinterJob.getPrinterJob();
+            job.setJobName(getTitle());
+            job.setPrintable((graphics, pageFormat, pageIndex) -> {
+                if (pageIndex > 0) return java.awt.print.Printable.NO_SUCH_PAGE;
+                Graphics2D g2 = (Graphics2D) graphics;
+                double imageableWidth = pageFormat.getImageableWidth();
+                double imageableHeight = pageFormat.getImageableHeight();
+                double scaleX = imageableWidth / printTarget.getWidth();
+                double scaleY = imageableHeight / printTarget.getHeight();
+                double scale = Math.min(scaleX, scaleY);
+                g2.translate(pageFormat.getImageableX(), pageFormat.getImageableY());
+                g2.scale(scale, scale);
+                printTarget.printAll(g2);
+                return java.awt.print.Printable.PAGE_EXISTS;
+            });
+            if (job.printDialog()) {
+                job.print();
+            }
+        } catch (PrinterException ex) {
+            javax.swing.JOptionPane.showMessageDialog(this,
+                "Print failed: " + ex.getMessage(),
+                "Print",
+                javax.swing.JOptionPane.ERROR_MESSAGE);
+        }
     }
     
     /**

@@ -9,7 +9,10 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
 import com.billing.gui.MainWindow;
+import com.billing.config.AppConfig;
+import com.billing.config.ConfigLoader;
 import com.billing.util.HibernateUtil;
+import com.billing.util.LogUtil;
 
 /**
  * Main application class for the Hibernate Billing System
@@ -20,22 +23,42 @@ public class MainApplication {
     private static final Logger logger = Logger.getLogger(MainApplication.class.getName());
     public static void main(String[] args) {
         try {
-            suppressHibernateLogs();
+            AppConfig cfg = ConfigLoader.load();
+            LogUtil.configure(cfg);
+            
             // Set Look and Feel to system default
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
             
             // Set default font to Calibri 12pt
             setDefaultFont();
-            
+
             // Initialize Hibernate
             logger.info("Initializing Hibernate with MySQL database...");
+            HibernateUtil.getSessionFactory();
+            
+            // Suppress Hibernate logs after initialization
+            suppressHibernateLogs();
+            
+            // Check if initialization was successful
+            if (!HibernateUtil.isInitialized()) {
+                Exception initError = HibernateUtil.getInitializationError();
+                logger.severe(() -> "Hibernate initialization failed: " + 
+                    (initError != null ? initError.getMessage() : "Unknown error"));
+                if (initError != null) {
+                    initError.printStackTrace();
+                }
+            }
             
             // Start GUI on EDT
             SwingUtilities.invokeLater(() -> {
                 try {
                     MainWindow mainWindow = new MainWindow();
                     mainWindow.setVisible(true);
-                    logger.info("Application started successfully with MySQL database");
+                    if (HibernateUtil.isInitialized()) {
+                        logger.info("Application started successfully with MySQL database");
+                    } else {
+                        logger.warning("Application started in offline mode (MySQL not available)");
+                    }
                     
                     // Check database connection status
                     if (!HibernateUtil.isInitialized()) {
@@ -68,9 +91,10 @@ public class MainApplication {
      */
     private static void showDatabaseConnectionError(Exception e) {
         String message = "Database Connection Error\n\n";
+        String errorMessage = (e != null && e.getMessage() != null) ? e.getMessage() : "Unknown database error";
         
-        if (e.getMessage().contains("Communications link failure") || 
-            e.getMessage().contains("Connection refused")) {
+        if (errorMessage.contains("Communications link failure") || 
+            errorMessage.contains("Connection refused")) {
             message += """
                        Cannot connect to MySQL database.
                        
@@ -82,9 +106,20 @@ public class MainApplication {
                        
                        The application will start in offline mode.
                        Database features will not be available.""";
+        } else if (errorMessage.contains("Table") || errorMessage.contains("schema") || 
+                   errorMessage.contains("column") || errorMessage.contains("doesn't exist")) {
+            message += """
+                       Database schema mismatch detected.
+                       
+                       Please run the database_schema_jpa.sql script to:
+                       \u2022 Recreate all tables with correct structure
+                       \u2022 Update column names and types
+                       \u2022 Add sample data
+                       
+                       The application will continue in offline mode.""";
         } else {
-            message += "Error: " + e.getMessage() + "\n\n" +
-                      "Please check your database configuration.";
+            message += "Error: " + errorMessage + "\n\n" +
+                      "Please check your database configuration and schema.";
         }
         
         JOptionPane.showMessageDialog(null, message, "Database Error", JOptionPane.WARNING_MESSAGE);
