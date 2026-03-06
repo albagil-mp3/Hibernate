@@ -7,7 +7,7 @@
     <session-factory>
         <!-- Database connection settings -->
         <property name="hibernate.connection.driver_class">com.mysql.cj.jdbc.Driver</property>
-        <property name="hibernate.connection.url">jdbc:mysql://localhost:3306/facturacio?useSSL=false&amp;serverTimezone=UTC&amp;allowPublicKeyRetrieval=true</property>
+        <property name="hibernate.connection.url">jdbc:mysql://localhost:3306/Facturacio?useSSL=false&amp;serverTimezone=UTC&amp;allowPublicKeyRetrieval=true</property>
         <property name="hibernate.connection.username">usuario</property>
         <property name="hibernate.connection.password">1234</property>
         
@@ -21,19 +21,27 @@
         <property name="hibernate.show_sql">true</property>
         <property name="hibernate.format_sql">true</property>
         
-        <!-- Drop and re-create the database schema on startup -->
-        <property name="hibernate.hbm2ddl.auto">update</property>
+        <!-- Do not auto-modify schema on startup (existing DB managed externally) -->
+        <property name="hibernate.hbm2ddl.auto">none</property>
         
         <!-- Disable bean validation to avoid javax/jakarta conflicts -->
         <property name="javax.persistence.validation.mode">none</property>
+
+        <!-- Current session context for getCurrentSession() -->
+        <property name="hibernate.current_session_context_class">thread</property>
         
         <!-- Names the annotated entity classes -->
-        <mapping class="com.billing.entity.Client"/>
-        <mapping class="com.billing.entity.Article"/>
-        <mapping class="com.billing.entity.Supplier"/>
-        <mapping class="com.billing.entity.ArticleFamily"/>
-        <mapping class="com.billing.entity.ArticleCategory"/>
-        <mapping class="com.billing.entity.Unit"/>
+        <mapping class="com.billing.model.party.Party"/>
+        <mapping class="com.billing.model.party.Client"/>
+        <mapping class="com.billing.model.party.Supplier"/>
+        <mapping class="com.billing.model.item.Item"/>
+        <mapping class="com.billing.model.item.ItemFamily"/>
+        <mapping class="com.billing.model.item.ItemCategory"/>
+        <mapping class="com.billing.model.item.Unit"/>
+        <mapping class="com.billing.model.document.BusinessDocument"/>
+        <mapping class="com.billing.model.document.DeliveryNote"/>
+        <mapping class="com.billing.model.document.Invoice"/>
+        <mapping class="com.billing.model.document.DocumentLine"/>
         
     </session-factory>
 </hibernate-configuration>

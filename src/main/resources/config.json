@@ -1,0 +1,6 @@
+{
+  "exportDir": "data/exports",
+  "importDir": "data/imports",
+  "backupDir": "data/backups",
+  "logDir": "logs"
+}

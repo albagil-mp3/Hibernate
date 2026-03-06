@@ -4,8 +4,11 @@ import java.net.URL;
 import java.util.logging.Logger;
 
 import org.hibernate.HibernateException;
+import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
+import java.util.function.Supplier;
 
 /**
  * Hibernate utility class for managing SessionFactory
@@ -29,6 +32,32 @@ public class HibernateUtil {
             initializeSessionFactory();
         }
         return sessionFactory;
+    }
+
+    /**
+     * Execute work within a Hibernate transaction bound to the current thread.
+     */
+    public static <T> T runInTransaction(Supplier<T> work) {
+        if (work == null) throw new IllegalArgumentException("work cannot be null");
+        Session session = getSessionFactory().getCurrentSession();
+        Transaction tx = session.getTransaction();
+        boolean newTx = tx == null || !tx.isActive();
+        if (newTx) tx = session.beginTransaction();
+        try {
+            T result = work.get();
+            if (newTx) tx.commit();
+            return result;
+        } catch (RuntimeException ex) {
+            if (newTx && tx != null) tx.rollback();
+            throw ex;
+        }
+    }
+
+    public static void runInTransaction(Runnable work) {
+        runInTransaction(() -> {
+            work.run();
+            return null;
+        });
     }
     
     /**

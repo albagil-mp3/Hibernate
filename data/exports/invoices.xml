@@ -1,0 +1,72 @@
+<InvoiceExport>
+  <invoices>
+    <invoices>
+      <id>2</id>
+      <code>INV0001</code>
+      <date>2026-02-14</date>
+      <clientCode>CLI0002</clientCode>
+      <clientName>Maria Lopez</clientName>
+      <subtotal>155.00</subtotal>
+      <taxes>24.30</taxes>
+      <total>179.30</total>
+      <lines>
+        <lines>
+          <itemCode>ITM0003</itemCode>
+          <itemDescription>A4 Paper 80gr (500 sheets)</itemDescription>
+          <quantity>10</quantity>
+          <unitPrice>8.00</unitPrice>
+          <taxRate>0.2100</taxRate>
+          <lineTotal>96.800000</lineTotal>
+        </lines>
+        <lines>
+          <itemCode>ITM0004</itemCode>
+          <itemDescription>Multi-purpose detergent 5L</itemDescription>
+          <quantity>5</quantity>
+          <unitPrice>15.00</unitPrice>
+          <taxRate>0.1000</taxRate>
+          <lineTotal>82.500000</lineTotal>
+        </lines>
+      </lines>
+    </invoices>
+    <invoices>
+      <id>3</id>
+      <code>INV0003</code>
+      <date>2026-02-14</date>
+      <clientCode>CLI0001</clientCode>
+      <clientName>Juan Garcia</clientName>
+      <subtotal>2400.00</subtotal>
+      <taxes>504.00</taxes>
+      <total>2904.00</total>
+      <lines>
+        <lines>
+          <itemCode>ITM0001</itemCode>
+          <itemDescription>Dell Latitude 5520 Laptop</itemDescription>
+          <quantity>2</quantity>
+          <unitPrice>1200.00</unitPrice>
+          <taxRate>0.2100</taxRate>
+          <lineTotal>2904.000000</lineTotal>
+        </lines>
+      </lines>
+    </invoices>
+    <invoices>
+      <id>4</id>
+      <code>INV0004</code>
+      <date>2026-02-14</date>
+      <clientCode>CLI0001</clientCode>
+      <clientName>Juan Garcia</clientName>
+      <subtotal>2400.00</subtotal>
+      <taxes>504.00</taxes>
+      <total>2904.00</total>
+      <lines>
+        <lines>
+          <itemCode>ITM0001</itemCode>
+          <itemDescription>Dell Latitude 5520 Laptop</itemDescription>
+          <quantity>2</quantity>
+          <unitPrice>1200.00</unitPrice>
+          <taxRate>0.2100</taxRate>
+          <lineTotal>2904.000000</lineTotal>
+        </lines>
+      </lines>
+    </invoices>
+  </invoices>
+</InvoiceExport>

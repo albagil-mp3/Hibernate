@@ -21,6 +21,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
+import javax.swing.JMenuItem;
 import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -28,8 +29,23 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 
 import com.billing.service.ClientService;
-import com.billing.service.ArticleService;
+import com.billing.service.DocumentQueryService;
+import com.billing.service.ItemService;
+import com.billing.service.SalesService;
+import com.billing.service.DeliveryService;
+import com.billing.service.SupplierService;
 import com.billing.util.HibernateUtil;
+import com.billing.config.AppConfig;
+import com.billing.config.ConfigLoader;
+import com.billing.io.ClientImporter;
+import com.billing.io.SupplierImporter;
+import com.billing.io.ItemImporter;
+import com.billing.service.ExportService;
+import com.billing.tx.HibernateTransactionManager;
+import com.billing.tx.TransactionManager;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import javax.swing.JFileChooser;
 
 /**
  * Main application window for the Billing System
@@ -38,11 +54,22 @@ import com.billing.util.HibernateUtil;
 public class MainWindow extends JFrame {
     
     private ClientService clientService;
-    private ArticleService articleService;
+    private ItemService itemService;
+    private SupplierService supplierService;
+    private SalesService salesService;
+    private DeliveryService deliveryService;
     private ClientManagementPanel clientManagementPanel;
-    private ArticleManagementPanel articleManagementPanel;
+    private ItemManagementPanel itemManagementPanel;
+    private SupplierManagementPanel supplierManagementPanel;
+    private DeliveryManagementPanel deliveryManagementPanel;
+    private OrderManagementPanel orderManagementPanel;
+    private InvoiceTrackingPanel invoiceTrackingPanel;
+    private final AppConfig appConfig;
+    private final TransactionManager tx = new HibernateTransactionManager();
+    private final ExportService exportService = new ExportService();
 
     public MainWindow() {
+        this.appConfig = ConfigLoader.load();
         initializeServices();
         initializeComponents();
         setupEventHandlers();
@@ -50,9 +77,12 @@ public class MainWindow extends JFrame {
     }
 
     private void initializeServices() {
-        clientService = new ClientService();
-        articleService = new ArticleService();
-        
+        clientService = new com.billing.service.ClientService();
+        itemService = new ItemService();
+        supplierService = new SupplierService();
+        salesService = new SalesService();
+        deliveryService = new DeliveryService(salesService);
+
         // Check database connectivity and show status
         if (!HibernateUtil.isInitialized()) {
             SwingUtilities.invokeLater(() -> {
@@ -76,8 +106,20 @@ public class MainWindow extends JFrame {
         // Initialize client management panel
         clientManagementPanel = new ClientManagementPanel(clientService);
         
-        // Initialize article management panel
-        articleManagementPanel = new ArticleManagementPanel(articleService);
+        // Initialize item management panel
+        itemManagementPanel = new ItemManagementPanel(itemService);
+
+        // Initialize supplier management panel
+        supplierManagementPanel = new SupplierManagementPanel(supplierService);
+        
+        // Initialize delivery management panel
+        deliveryManagementPanel = new DeliveryManagementPanel(deliveryService);
+
+        // Initialize order management panel
+        orderManagementPanel = new OrderManagementPanel(deliveryService);
+        
+        // Initialize invoice management panel
+        invoiceTrackingPanel = new InvoiceTrackingPanel(new DocumentQueryService(), exportService);
 
         // Start with welcome panel
         add(createWelcomePanel(), BorderLayout.CENTER);
@@ -91,7 +133,7 @@ public class MainWindow extends JFrame {
         JMenu homeMenu = new JMenu("Home");
         styleMenu(homeMenu);
         homeMenu.setIcon(UIConstants.loadIcon("/icons/home-dark.png", 12));
-        homeMenu.setForeground(UIConstants.MODULE_CLIENTS_TEXT);
+        homeMenu.setForeground(Color.BLACK);
         homeMenu.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -110,25 +152,47 @@ public class MainWindow extends JFrame {
             }
         });
         
-        JMenu invoicesMenu = new JMenu("Invoices");
-        styleMenu(invoicesMenu);
-        invoicesMenu.setIcon(UIConstants.loadIcon("/icons/invoices-dark.png", 12));
-        invoicesMenu.setForeground(UIConstants.MODULE_INVOICES_TEXT);
-        invoicesMenu.addMouseListener(new MouseAdapter() {
+        JMenu ordersMenu = new JMenu("Orders");
+        styleMenu(ordersMenu);
+        ordersMenu.setIcon(UIConstants.loadIcon("/icons/orders-dark.png", 12));
+        ordersMenu.setForeground(UIConstants.MODULE_ORDERS_TEXT);
+        ordersMenu.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                showModuleStub("Invoices");
+                showOrderManagement();
             }
         });
 
-        JMenu productsMenu = new JMenu("Articles");
-        styleMenu(productsMenu);
-        productsMenu.setIcon(UIConstants.loadIcon("/icons/products-dark.png", 12));
-        productsMenu.setForeground(UIConstants.MODULE_PRODUCTS_TEXT);
-        productsMenu.addMouseListener(new MouseAdapter() {
+        JMenu invoiceMenu = new JMenu("Invoices");
+        styleMenu(invoiceMenu);
+        invoiceMenu.setIcon(UIConstants.loadIcon("/icons/invoice-dark.png", 12));
+        invoiceMenu.setForeground(UIConstants.MODULE_INVOICES_TEXT);
+        invoiceMenu.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                showArticleManagement();
+                showInvoiceTracking();
+            }
+        });
+
+        JMenu deliveryMenu = new JMenu("Delivery Notes");
+        styleMenu(deliveryMenu);
+        deliveryMenu.setIcon(UIConstants.loadIcon("/icons/delivery-dark.png", 12));
+        deliveryMenu.setForeground(UIConstants.MODULE_DELIVERY_TEXT);
+        deliveryMenu.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                showDeliveryManagement();
+            }
+        });
+
+        JMenu ItemsMenu = new JMenu("Items");
+        styleMenu(ItemsMenu);
+        ItemsMenu.setIcon(UIConstants.loadIcon("/icons/items-dark.png", 12));
+        ItemsMenu.setForeground(UIConstants.MODULE_ITEMS_TEXT);
+        ItemsMenu.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                showItemManagement();
             }
         });
 
@@ -139,15 +203,69 @@ public class MainWindow extends JFrame {
         suppliersMenu.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                showModuleStub("Suppliers");
+                showSupplierManagement();
             }
         });
 
         menuBar.add(homeMenu);
         menuBar.add(clientsMenu);
-        menuBar.add(invoicesMenu);
-        menuBar.add(productsMenu);
         menuBar.add(suppliersMenu);
+        menuBar.add(ItemsMenu);
+        menuBar.add(ordersMenu);
+        menuBar.add(deliveryMenu);
+        menuBar.add(invoiceMenu);
+     
+
+        // Tools menu for maintenance actions
+        JMenu toolsMenu = new JMenu("Tools");
+        styleMenu(toolsMenu);
+        toolsMenu.setIcon(UIConstants.loadIcon("/icons/tools-dark.png", 12));
+        toolsMenu.setForeground(Color.BLACK);
+        JMenuItem regenCodesItem = new JMenuItem("Regenerate Codes");
+        regenCodesItem.addActionListener(e -> {
+            int opt = JOptionPane.showConfirmDialog(this,
+                    "Regenerate codes for all items, suppliers and clients? This will update the database.",
+                    "Confirm Regenerate Codes",
+                    JOptionPane.YES_NO_OPTION,
+                    JOptionPane.QUESTION_MESSAGE);
+            if (opt == JOptionPane.YES_OPTION) {
+                // Run regeneration and show results
+                int itemsUpdated = 0;
+                int clientsUpdated = 0;
+                int suppliersUpdated = 0;
+                try {
+                    itemsUpdated = itemService.regenerateAllItemCodes();
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(this, "Error regenerating item codes: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                }
+                try {
+                    clientsUpdated = clientService.regenerateAllClientCodes();
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(this, "Error regenerating client codes: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                }
+                try {
+                    suppliersUpdated = supplierService.regenerateAllSupplierCodes();
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(this, "Error regenerating supplier codes: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                }
+                JOptionPane.showMessageDialog(this, "Regeneration completed.\nItems updated: " + itemsUpdated + "\nClients updated: " + clientsUpdated + "\nSuppliers updated: " + suppliersUpdated,
+                        "Regeneration Completed", JOptionPane.INFORMATION_MESSAGE);
+            }
+        });
+        toolsMenu.add(regenCodesItem);
+
+        JMenuItem importClientsJson = new JMenuItem("Import Clients (JSON)");
+        importClientsJson.addActionListener(e -> importClients());
+        toolsMenu.add(importClientsJson);
+
+        JMenuItem importSuppliersJson = new JMenuItem("Import Suppliers (JSON)");
+        importSuppliersJson.addActionListener(e -> importSuppliers());
+        toolsMenu.add(importSuppliersJson);
+
+        JMenuItem importItemsJson = new JMenuItem("Import Items (JSON)");
+        importItemsJson.addActionListener(e -> importItems());
+        toolsMenu.add(importItemsJson);
+        menuBar.add(toolsMenu);
 
         return menuBar;
     }
@@ -174,18 +292,31 @@ public class MainWindow extends JFrame {
         setTitle("Billing System - Client Management");
     }
     
-    private void showArticleManagement() {
+    private void showItemManagement() {
         getContentPane().removeAll();
-        // Wrap the article management panel in a module-colored gradient
+        // Wrap the item management panel in a module-colored gradient
         GradientPanel wrapper = new GradientPanel(
-            UIConstants.adjustBrightness(UIConstants.MODULE_PRODUCTS_BG, 0.85f),
-            UIConstants.MODULE_PRODUCTS_BG);
+            UIConstants.adjustBrightness(UIConstants.MODULE_ITEMS_BG, 0.85f),
+            UIConstants.MODULE_ITEMS_BG);
         wrapper.setLayout(new BorderLayout());
-        wrapper.add(articleManagementPanel, BorderLayout.CENTER);
+        wrapper.add(itemManagementPanel, BorderLayout.CENTER);
         add(wrapper, BorderLayout.CENTER);
         revalidate();
         repaint();
-        setTitle("Billing System - Article Management");
+        setTitle("Billing System - Item Management");
+    }
+
+    private void showSupplierManagement() {
+        getContentPane().removeAll();
+        GradientPanel wrapper = new GradientPanel(
+            UIConstants.adjustBrightness(UIConstants.MODULE_SUPPLIERS_BG, 0.85f),
+            UIConstants.MODULE_SUPPLIERS_BG);
+        wrapper.setLayout(new BorderLayout());
+        wrapper.add(supplierManagementPanel, BorderLayout.CENTER);
+        add(wrapper, BorderLayout.CENTER);
+        revalidate();
+        repaint();
+        setTitle("Billing System - Supplier Management");
     }
 
     private JPanel createWelcomePanel() {
@@ -216,7 +347,7 @@ public class MainWindow extends JFrame {
         contentPanel.setOpaque(false);
         contentPanel.setBorder(BorderFactory.createEmptyBorder(20, 40, 40, 40));
 
-        JPanel modulesGrid = new JPanel(new GridLayout(2, 2, 20, 20));
+        JPanel modulesGrid = new JPanel(new GridLayout(2, 3, 20, 20));
         modulesGrid.setOpaque(false);
 
         JButton clientsBtn = UIConstants.createModuleButton("CLIENTS",
@@ -227,34 +358,52 @@ public class MainWindow extends JFrame {
             UIConstants.MODULE_CLIENTS_BORDER);
         clientsBtn.addActionListener(e -> showClientManagement());
 
-        JButton invoicesBtn = UIConstants.createModuleButton("INVOICES",
-            UIConstants.loadIcon("/icons/invoices.png", 56),
-            UIConstants.MODULE_INVOICES_TEXT,
-            Color.WHITE,
-            UIConstants.MODULE_INVOICES_ICON,
-            UIConstants.MODULE_INVOICES_BORDER);
-        invoicesBtn.addActionListener(e -> showModuleStub("Invoices"));
-
-        JButton productsBtn = UIConstants.createModuleButton("ARTICLES",
-            UIConstants.loadIcon("/icons/products.png", 56),
-            UIConstants.MODULE_PRODUCTS_TEXT,
-            Color.WHITE,
-            UIConstants.MODULE_PRODUCTS_ICON,
-            UIConstants.MODULE_PRODUCTS_BORDER);
-        productsBtn.addActionListener(e -> showArticleManagement());
-
         JButton suppliersBtn = UIConstants.createModuleButton("SUPPLIERS",
             UIConstants.loadIcon("/icons/suppliers.png", 56),
             UIConstants.MODULE_SUPPLIERS_TEXT,
             Color.WHITE,
             UIConstants.MODULE_SUPPLIERS_ICON,
             UIConstants.MODULE_SUPPLIERS_BORDER);
-        suppliersBtn.addActionListener(e -> showModuleStub("Suppliers"));
+        suppliersBtn.addActionListener(e -> showSupplierManagement());
+
+        JButton itemsBtn = UIConstants.createModuleButton("ITEMS",
+            UIConstants.loadIcon("/icons/items.png", 56),
+            UIConstants.MODULE_ITEMS_TEXT,
+            Color.WHITE,
+            UIConstants.MODULE_ITEMS_ICON,
+            UIConstants.MODULE_ITEMS_BORDER);
+        itemsBtn.addActionListener(e -> showItemManagement());
+
+        JButton ordersBtn = UIConstants.createModuleButton("ORDERS",
+            UIConstants.loadIcon("/icons/orders.png", 56),
+            UIConstants.MODULE_ORDERS_TEXT,
+            Color.WHITE,
+            UIConstants.MODULE_ORDERS_ICON,
+            UIConstants.MODULE_ORDERS_BORDER);
+        ordersBtn.addActionListener(e -> showOrderManagement());
+
+        JButton deliveryBtn = UIConstants.createModuleButton("DELIVERY NOTES",
+            UIConstants.loadIcon("/icons/delivery.png", 56),
+            UIConstants.MODULE_DELIVERY_TEXT,
+            Color.WHITE,
+            UIConstants.MODULE_DELIVERY_ICON,
+            UIConstants.MODULE_DELIVERY_BORDER);
+        deliveryBtn.addActionListener(e -> showDeliveryManagement());
+
+        JButton invoiceBtn = UIConstants.createModuleButton("INVOICES",
+            UIConstants.loadIcon("/icons/invoice.png", 56),
+            UIConstants.MODULE_INVOICES_TEXT,
+            Color.WHITE,
+            UIConstants.MODULE_INVOICES_ICON,
+            UIConstants.MODULE_INVOICES_BORDER);
+        invoiceBtn.addActionListener(e -> showInvoiceTracking());
 
         modulesGrid.add(clientsBtn);
-        modulesGrid.add(invoicesBtn);
-        modulesGrid.add(productsBtn);
         modulesGrid.add(suppliersBtn);
+        modulesGrid.add(itemsBtn);
+        modulesGrid.add(ordersBtn);
+        modulesGrid.add(deliveryBtn);
+        modulesGrid.add(invoiceBtn);
 
         contentPanel.add(modulesGrid, BorderLayout.CENTER);
 
@@ -328,11 +477,52 @@ public class MainWindow extends JFrame {
         if (moduleName == null) return UIConstants.MODULE_CLIENTS_BG;
         return switch (moduleName.toLowerCase()) {
             case "clients" -> UIConstants.MODULE_CLIENTS_BG;
-            case "products", "articles" -> UIConstants.MODULE_PRODUCTS_BG;
+            case "products", "articles" -> UIConstants.MODULE_ITEMS_BG;
             case "suppliers" -> UIConstants.MODULE_SUPPLIERS_BG;
-            case "invoices" -> UIConstants.MODULE_INVOICES_BG;
+            case "orders", "invoices" -> UIConstants.MODULE_INVOICES_BG;
+            case "delivery", "delivery notes", "delivery management", "delivery notes management" -> UIConstants.MODULE_DELIVERY_BG;
             default -> UIConstants.MODULE_CLIENTS_BG;
         };
+    }
+
+    private void showDeliveryManagement() {
+        getContentPane().removeAll();
+        GradientPanel wrapper = new GradientPanel(
+            UIConstants.adjustBrightness(UIConstants.MODULE_DELIVERY_BG, 0.85f),
+            UIConstants.MODULE_DELIVERY_BG);
+        wrapper.setLayout(new BorderLayout());
+        deliveryManagementPanel.reloadDeliveries();
+        wrapper.add(deliveryManagementPanel, BorderLayout.CENTER);
+        add(wrapper, BorderLayout.CENTER);
+        revalidate();
+        repaint();
+        setTitle("Billing System - Delivery Notes Management");
+    }
+
+    private void showInvoiceTracking() {
+        getContentPane().removeAll();
+        GradientPanel wrapper = new GradientPanel(
+            UIConstants.adjustBrightness(UIConstants.MODULE_INVOICES_BG, 0.85f),
+            UIConstants.MODULE_INVOICES_BG);
+        wrapper.setLayout(new BorderLayout());
+        wrapper.add(invoiceTrackingPanel, BorderLayout.CENTER);
+        add(wrapper, BorderLayout.CENTER);
+        revalidate();
+        repaint();
+        setTitle("Billing System - Invoice Management");
+    }
+
+    private void showOrderManagement() {
+        getContentPane().removeAll();
+        GradientPanel wrapper = new GradientPanel(
+            UIConstants.adjustBrightness(UIConstants.MODULE_INVOICES_BG, 0.85f),
+            UIConstants.MODULE_INVOICES_BG);
+        wrapper.setLayout(new BorderLayout());
+        wrapper.add(orderManagementPanel, BorderLayout.CENTER);
+        add(wrapper, BorderLayout.CENTER);
+        revalidate();
+        repaint();
+        setTitle("Billing System - Order Management");
     }
 
     /**
@@ -357,6 +547,62 @@ public class MainWindow extends JFrame {
         if (option == JOptionPane.YES_OPTION) {
             dispose();
             System.exit(0);
+        }
+    }
+
+    private void importClients() {
+        try {
+            Path importDir = Paths.get(appConfig.getImportDir());
+            JFileChooser chooser = new JFileChooser(importDir.toFile());
+            int result = chooser.showOpenDialog(this);
+            if (result != JFileChooser.APPROVE_OPTION) return;
+            Path source = chooser.getSelectedFile().toPath();
+            ClientImporter importer = new ClientImporter();
+            var dtos = importer.importFromJson(source, Paths.get(appConfig.getBackupDir()));
+            com.billing.service.ImportResult r = clientService.importClients(dtos);
+            clientManagementPanel.loadClients();
+            JOptionPane.showMessageDialog(this,
+                    "Import completed.\nImported: " + r.imported + "\nSkipped: " + r.skipped + "\nFailed: " + r.failed,
+                    "Import", JOptionPane.INFORMATION_MESSAGE);
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Import failed: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void importSuppliers() {
+        try {
+            Path importDir = Paths.get(appConfig.getImportDir());
+            JFileChooser chooser = new JFileChooser(importDir.toFile());
+            int result = chooser.showOpenDialog(this);
+            if (result != JFileChooser.APPROVE_OPTION) return;
+            Path source = chooser.getSelectedFile().toPath();
+            SupplierImporter importer = new SupplierImporter();
+            var dtos = importer.importFromJson(source, Paths.get(appConfig.getBackupDir()));
+            com.billing.service.ImportResult r = supplierService.importSuppliers(dtos);
+            JOptionPane.showMessageDialog(this,
+                    "Import completed.\nImported: " + r.imported + "\nSkipped: " + r.skipped + "\nFailed: " + r.failed,
+                    "Import", JOptionPane.INFORMATION_MESSAGE);
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Import failed: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void importItems() {
+        try {
+            Path importDir = Paths.get(appConfig.getImportDir());
+            JFileChooser chooser = new JFileChooser(importDir.toFile());
+            int result = chooser.showOpenDialog(this);
+            if (result != JFileChooser.APPROVE_OPTION) return;
+            Path source = chooser.getSelectedFile().toPath();
+            ItemImporter importer = new ItemImporter();
+            var dtos = importer.importFromJson(source, Paths.get(appConfig.getBackupDir()));
+            com.billing.service.ImportResult r = itemService.importItems(dtos);
+            itemManagementPanel.reloadItems();
+            JOptionPane.showMessageDialog(this,
+                    "Import completed.\nImported: " + r.imported + "\nSkipped: " + r.skipped + "\nFailed: " + r.failed,
+                    "Import", JOptionPane.INFORMATION_MESSAGE);
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Import failed: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 

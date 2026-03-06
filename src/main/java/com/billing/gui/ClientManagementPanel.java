@@ -30,7 +30,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
-import com.billing.entity.Client;
+import com.billing.model.party.Client;
 import com.billing.service.ClientService;
 
 
@@ -45,6 +45,7 @@ public class ClientManagementPanel extends JPanel {
     private DefaultTableModel tableModel;
     private JTextField searchField;
     private JComboBox<String> sortComboBox;
+    private List<Client> currentClients = java.util.Collections.emptyList();
     
     // Button references
     private JButton searchButton;
@@ -57,7 +58,7 @@ public class ClientManagementPanel extends JPanel {
     
     // Column names for the table
     private final String[] columnNames = {
-        "ID", "Code", "Name", "DNI", "Address", "City", "Province", 
+        "Code", "Name", "DNI", "Address", "City", "Province", 
         "Postal Code", "Fixed Phone", "Mobile Phone", "Email", 
         "Website", "Payment Method", "Credit Limit", "Active"
     };
@@ -75,7 +76,7 @@ public class ClientManagementPanel extends JPanel {
         searchField = new JTextField(20);
         searchField.setFont(UIConstants.UI_FONT);
         
-        String[] sortOptions = {"Sort by ID", "Sort by DNI", "Sort by Name"};
+        String[] sortOptions = {"Sort by Code", "Sort by DNI", "Sort by Name"};
         sortComboBox = new JComboBox<>(sortOptions);
         sortComboBox.setFont(UIConstants.UI_FONT);
         sortComboBox.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
@@ -100,9 +101,8 @@ public class ClientManagementPanel extends JPanel {
             public Class<?> getColumnClass(int columnIndex) {
                 // Ensure proper class types for each column
                 return switch (columnIndex) {
-                    case 0 -> Integer.class;        // ID
-                    case 13 -> BigDecimal.class;    // Credit Limit
-                    case 14 -> String.class;        // Active (Yes/No)
+                    case 12 -> BigDecimal.class;    // Credit Limit
+                    case 13 -> String.class;        // Active (Yes/No)
                     default -> String.class;        // All other columns are String
                 }; 
             }
@@ -316,7 +316,7 @@ public class ClientManagementPanel extends JPanel {
         });
     }
     
-    private void loadClients() {
+    public void loadClients() {
         try {
             List<Client> clients = clientService.getAllClients();
             updateTable(clients);
@@ -335,10 +335,10 @@ public class ClientManagementPanel extends JPanel {
     
     private void updateTable(List<Client> clients) {
         tableModel.setRowCount(0); // Clear existing rows
+        currentClients = clients != null ? clients : java.util.Collections.emptyList();
         
         for (Client client : clients) {
             Object[] rowData = {
-                client.getId(),
                 client.getCode() != null ? client.getCode() : "",
                 client.getName(),
                 client.getDni(),
@@ -390,7 +390,7 @@ public class ClientManagementPanel extends JPanel {
             List<Client> clients;
             
             clients = switch (selectedSort) {
-                case "Sort by ID" -> clientService.getAllClientsOrderedById();
+                case "Sort by CODE" -> clientService.getAllClientsOrderedByCode();
                 case "Sort by DNI" -> clientService.getAllClientsOrderedByDni();
                 case "Sort by Name" -> clientService.getAllClientsOrderedByName();
                 default -> clientService.getAllClients();
@@ -449,7 +449,8 @@ public class ClientManagementPanel extends JPanel {
         
         try {
             int modelRow = clientTable.convertRowIndexToModel(selectedRow);
-            Integer clientId = (Integer) tableModel.getValueAt(modelRow, 0);
+            Long clientId = currentClients.size() > modelRow ? currentClients.get(modelRow).getId() : null;
+            if (clientId == null) throw new IllegalArgumentException("Client not found");
             Client client = clientService.findClientById(clientId);
             
             if (client != null) {
@@ -490,8 +491,9 @@ public class ClientManagementPanel extends JPanel {
         
         try {
             int modelRow = clientTable.convertRowIndexToModel(selectedRow);
-            Integer clientId = (Integer) tableModel.getValueAt(modelRow, 0);
-            String clientName = (String) tableModel.getValueAt(modelRow, 2);
+            Long clientId = currentClients.size() > modelRow ? currentClients.get(modelRow).getId() : null;
+            if (clientId == null) throw new IllegalArgumentException("Client not found");
+            String clientName = (String) tableModel.getValueAt(modelRow, 1);
             
             int option = JOptionPane.showConfirmDialog(this,
                 "Are you sure you want to delete client '" + clientName + "'?\n" +
@@ -533,7 +535,8 @@ public class ClientManagementPanel extends JPanel {
         
         try {
             int modelRow = clientTable.convertRowIndexToModel(selectedRow);
-            Integer clientId = (Integer) tableModel.getValueAt(modelRow, 0);
+            Long clientId = currentClients.size() > modelRow ? currentClients.get(modelRow).getId() : null;
+            if (clientId == null) throw new IllegalArgumentException("Client not found");
             Client client = clientService.findClientById(clientId);
             
             if (client != null) {

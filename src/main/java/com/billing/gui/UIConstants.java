@@ -24,6 +24,7 @@ import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 import javax.swing.border.Border;
 
 /**
@@ -38,10 +39,10 @@ public final class UIConstants {
     public static final Color MODULE_CLIENTS_BORDER = new Color(0x90CAF9);
 
     // Products - Green growth
-    public static final Color MODULE_PRODUCTS_BG = new Color(0xE8F5E9);
-    public static final Color MODULE_PRODUCTS_TEXT = new Color(0x2E7D32);
-    public static final Color MODULE_PRODUCTS_ICON = new Color(0x4CAF50);
-    public static final Color MODULE_PRODUCTS_BORDER = new Color(0xA5D6A7);
+    public static final Color MODULE_ITEMS_BG = new Color(0xE8F5E9);
+    public static final Color MODULE_ITEMS_TEXT = new Color(0x2E7D32);
+    public static final Color MODULE_ITEMS_ICON = new Color(0x4CAF50);
+    public static final Color MODULE_ITEMS_BORDER = new Color(0xA5D6A7);
 
     // Suppliers - Orange energy
     public static final Color MODULE_SUPPLIERS_BG = new Color(0xFFF3E0);
@@ -49,11 +50,24 @@ public final class UIConstants {
     public static final Color MODULE_SUPPLIERS_ICON = new Color(0xFF9800);
     public static final Color MODULE_SUPPLIERS_BORDER = new Color(0xFFCC80);
 
-    // Invoices - PProfessional purple
+    // Invoices - Professional purple
     public static final Color MODULE_INVOICES_BG = new Color(0xF3E5F5);
     public static final Color MODULE_INVOICES_TEXT = new Color(0x7B1FA2);
     public static final Color MODULE_INVOICES_ICON = new Color(0x9C27B0);
     public static final Color MODULE_INVOICES_BORDER = new Color(0xCE93D8);
+
+    // Delivery Notes - Logistic amber
+    public static final Color MODULE_DELIVERY_BG = new Color(0xFFFDE7);
+    public static final Color MODULE_DELIVERY_TEXT = new Color(0xF9A825);
+    public static final Color MODULE_DELIVERY_ICON = new Color(0xFFC107);
+    public static final Color MODULE_DELIVERY_BORDER = new Color(0xFFE082);
+
+    // Orders - Corporate teal
+    public static final Color MODULE_ORDERS_BG = new Color(0xE0F2F1);
+    public static final Color MODULE_ORDERS_TEXT = new Color(0x00695C);
+    public static final Color MODULE_ORDERS_ICON = new Color(0x009688);
+    public static final Color MODULE_ORDERS_BORDER = new Color(0x80CBC4);
+
 
     // Semantic palettes
     // SUCCESS (Green)
@@ -205,6 +219,17 @@ public final class UIConstants {
         return icon;
     }
 
+    /**
+     * Show an informational message dialog on the EDT.
+     */
+    public static void showInfo(Component parent, String message) {
+        if (SwingUtilities.isEventDispatchThread()) {
+            javax.swing.JOptionPane.showMessageDialog(parent, message, "Info", javax.swing.JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            SwingUtilities.invokeLater(() -> javax.swing.JOptionPane.showMessageDialog(parent, message, "Info", javax.swing.JOptionPane.INFORMATION_MESSAGE));
+        }
+    }
+
     // ---------- Button factories (primary / secondary / danger / success) ----------
     public static JButton createPrimaryButton(String text, Icon icon) {
         // Primary
@@ -215,6 +240,8 @@ public final class UIConstants {
 
         RoundedButton b = new RoundedButton(text != null ? text.toUpperCase() : null, scaleIcon(icon, 18), 8, primaryColor, Color.WHITE, true, true, primaryHover, primaryPressed);
         applyCommonButtonProps(b, UI_FONT.deriveFont(Font.BOLD, 14f), new Insets(6, 24, 6, 24), 12);
+        UIManager.put("Button.disabledText", Color.WHITE);
+        b.setForeground(Color.WHITE);
         return b;
     }
 
@@ -226,6 +253,7 @@ public final class UIConstants {
 
         RoundedButton b = new RoundedButton(text != null ? text.toUpperCase() : null, scaleIcon(icon, 18), 8, secBg, Color.WHITE, true, true, secHover, secPressed);
         applyCommonButtonProps(b, UI_FONT.deriveFont(Font.BOLD, 14f), new Insets(10, 22, 10, 22), 8);
+        UIManager.put("Button.disabledText", Color.WHITE);
         b.setForeground(Color.WHITE);
         return b;
     }
@@ -234,6 +262,8 @@ public final class UIConstants {
         // Dangerous actions (red)
         RoundedButton b = new RoundedButton(text, scaleIcon(icon, 18), 6, DANGER, Color.WHITE, true, true);
         applyCommonButtonProps(b, UI_FONT.deriveFont(Font.BOLD, 14f), new Insets(6, 10, 6, 10), 8);
+        UIManager.put("Button.disabledText", Color.WHITE);
+        b.setForeground(Color.WHITE);
         return b;
     }
 
@@ -241,6 +271,8 @@ public final class UIConstants {
         // Success / confirm
         RoundedButton b = new RoundedButton(text, scaleIcon(icon, 18), 6, SUCCESS, Color.WHITE, true, true);
         applyCommonButtonProps(b, UI_FONT.deriveFont(Font.BOLD, 14f), new Insets(6, 12, 6, 12), 8);
+        UIManager.put("Button.disabledText", Color.WHITE);
+        b.setForeground(Color.WHITE);
         return b;
     }
 
@@ -309,6 +341,11 @@ public final class UIConstants {
             setOpaque(false);
             setForeground(fgColor);
             setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+            
+            // Keep icon visible when disabled (don't gray it out)
+            if (icon != null) {
+                setDisabledIcon(icon);
+            }
 
             // capture original foreground now; border may be assigned later so capture on first hover
             this.originalForeground = getForeground();
@@ -358,6 +395,11 @@ public final class UIConstants {
             Color bg = baseColor;
             if (pressed) bg = pressedColor;
             else if (hover) bg = hoverColor;
+            
+            // Apply transparency for disabled state instead of gray overlay
+            if (!isEnabled()) {
+                bg = new Color(bg.getRed(), bg.getGreen(), bg.getBlue(), 128);
+            }
 
             if (drawShadow && filled) {
                 // use a tinted semi-transparent shadow based on the base color
@@ -377,6 +419,11 @@ public final class UIConstants {
             }
 
             g2.dispose();
+            
+            // Keep text white even when disabled
+            if (!isEnabled()) {
+                setForeground(Color.WHITE);
+            }
 
             super.paintComponent(g);
         }

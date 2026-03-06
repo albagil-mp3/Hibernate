@@ -1,0 +1,25 @@
+[
+  {
+    "name": "TechnoSupply SL",
+    "taxId": "SUP-TECHNO-001",
+    "address": "Tech Street 1",
+    "phone": "932111111",
+    "email": "info@technosupply.test",
+    "city": "Barcelona",
+    "province": "BARCELONA",
+    "postalCode": "08001",
+    "website": "technosupply.test",
+    "active": true
+  },
+  {
+    "name": "OfficeTotal SL",
+    "taxId": "SUP-OFFICE-001",
+    "address": "Office Ave 15",
+    "phone": "972222222",
+    "email": "sales@officetotal.test",
+    "city": "Girona",
+    "province": "GIRONA",
+    "postalCode": "17001",
+    "active": true
+  }
+]

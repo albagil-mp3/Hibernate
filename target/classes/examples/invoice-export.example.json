@@ -1,0 +1,23 @@
+[
+  {
+    "id": 1,
+    "code": "INV0001",
+    "date": "2026-02-13",
+    "clientId": 1,
+    "clientName": "Juan Garcia",
+    "subtotal": 100.0,
+    "taxes": 21.0,
+    "total": 121.0,
+    "lines": [
+      {
+        "itemId": 1,
+        "itemCode": "ITM0001",
+        "itemDescription": "Dell Latitude 5520 Laptop",
+        "quantity": 1,
+        "unitPrice": 100.0,
+        "taxRate": 0.21,
+        "lineTotal": 121.0
+      }
+    ]
+  }
+]

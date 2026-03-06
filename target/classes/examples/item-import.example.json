@@ -1,0 +1,30 @@
+[
+  {
+    "name": "Monitor 24\" LED",
+    "description": "24 inch LED monitor",
+    "familyCode": "ELEC",
+    "categoryCode": "EQUIP",
+    "unitSymbol": "UN",
+    "supplierCode": "SUP0001",
+    "costPrice": 110.0,
+    "salePrice": 169.0,
+    "ivaPercent": 21,
+    "currentStock": 20,
+    "minimumStock": 5,
+    "barcode": "8400000000012",
+    "observations": "HDMI + DisplayPort",
+    "active": true
+  },
+  {
+    "name": "A4 Paper 80gr (500)",
+    "familyCode": "CONS",
+    "categoryCode": "CONSUM",
+    "unitSymbol": "UN",
+    "supplierCode": "SUP0002",
+    "costPrice": 4.5,
+    "salePrice": 7.9,
+    "ivaPercent": 21,
+    "currentStock": 200,
+    "minimumStock": 50
+  }
+]

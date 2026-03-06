@@ -4,12 +4,14 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import com.billing.dao.ClientDAO;
-import com.billing.dao.ClientDAOImpl;
-import com.billing.entity.Client;
-import com.billing.entity.SpanishProvince;
-import com.billing.util.HibernateUtil;
-import com.billing.util.SpanishValidationUtil;
+import com.billing.model.SpanishProvince;
+import com.billing.model.party.Client;
+import com.billing.dto.ClientImportDTO;
+import com.billing.repository.RepositoryFactory;
+import com.billing.repository.interfaces.PartyRepository;
+import com.billing.service.validation.SpanishValidationUtil;
+import com.billing.tx.HibernateTransactionManager;
+import com.billing.tx.TransactionManager;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
@@ -23,22 +25,23 @@ import jakarta.validation.ValidatorFactory;
 public class ClientService {
     
     private static final Logger logger = Logger.getLogger(ClientService.class.getName());
-    private final ClientDAO clientDAO;
+    private final PartyRepository partyRepository;
+    private final TransactionManager tx;
+    private final CodeGenerator codeGenerator;
     private final Validator validator;
-    private final boolean hibernateAvailable;
-    
+
+    /**
+     * Constructor: obtains DAO implementation exclusively from RepositoryFactory.
+     */
     public ClientService() {
-        this.clientDAO = new ClientDAOImpl();
+        this.partyRepository = RepositoryFactory.createPartyRepository();
+        this.tx = new HibernateTransactionManager();
+        this.codeGenerator = new CodeGenerator(partyRepository);
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         this.validator = factory.getValidator();
-        
-        // Check Hibernate availability and log status
-        this.hibernateAvailable = HibernateUtil.isInitialized();
-        if (!hibernateAvailable) {
-            logger.warning("Hibernate not initialized. Running in offline mode; database operations may be limited.");
-        }
+        logger.info("ClientService initialized with PartyRepository");
     }
-    
+
     /**
      * Creates a new client with validation
      * @param client Client to create
@@ -49,7 +52,7 @@ public class ClientService {
         validateClient(client);
         
         // Additional business validations
-        if (clientDAO.existsByDni(client.getDni())) {
+        if (partyRepository.existsClientByDni(client.getDni())) {
             throw new IllegalArgumentException("Client with DNI " + client.getDni() + " already exists");
         }
         
@@ -58,10 +61,17 @@ public class ClientService {
             throw new IllegalArgumentException("Invalid DNI: letter does not match number");
         }
         
-        // Validate postal code matches province
-        if (client.getPostalCode() != null && client.getProvince() != null) {
-            if (!SpanishValidationUtil.isValidPostalCodeForProvince(client.getPostalCode(), client.getProvince())) {
-                throw new IllegalArgumentException("Postal code does not match the selected province");
+        // Validate postal code and infer/verify province
+        if (client.getPostalCode() != null) {
+            SpanishProvince inferred = SpanishProvince.getByPostalCode(client.getPostalCode());
+            if (inferred == null) {
+                throw new IllegalArgumentException("Postal code is invalid or does not match any province");
+            }
+            if (client.getProvince() == null) {
+                client.setProvince(inferred);
+            } else if (!inferred.equals(client.getProvince())) {
+                logger.warning(() -> "Postal code disagrees with provided province; overriding with " + inferred);
+                client.setProvince(inferred);
             }
         }
         
@@ -69,17 +79,22 @@ public class ClientService {
         client.setDni(SpanishValidationUtil.formatDNI(client.getDni()));
         
         logger.info(() -> "Creating new client: " + client.getName());
-        // Save client first to obtain generated ID
-        Client saved = clientDAO.save(client);
-        if (saved != null && saved.getId() != null) {
-            Integer id = saved.getId();
-            String generatedCode = String.format("CLI%03d", id);
-            // Persist the generated code directly via DAO to avoid DB trigger constraints
-            clientDAO.updateCode(id, generatedCode);
-            // Refresh entity state
-            saved = clientDAO.findById(id);
-        }
-        return saved;
+        return tx.runInTransaction(() -> {
+            client.setCode(codeGenerator.nextClientCode());
+            return partyRepository.saveClient(client);
+        });
+    }
+
+    /**
+     * Regenerate codes for all clients (useful after bulk import).
+     * Returns the number of updated rows.
+     */
+    public int regenerateAllClientCodes() {
+        return tx.runInTransaction(() -> {
+            int updated = codeGenerator.resequenceClients();
+            logger.info("Regenerated codes for clients: " + updated);
+            return updated;
+        });
     }
     
     /**
@@ -96,13 +111,13 @@ public class ClientService {
         }
         
         // Check if client exists
-        Client existingClient = clientDAO.findById(client.getId());
+        Client existingClient = partyRepository.findClientById(client.getId());
         if (existingClient == null) {
             throw new IllegalArgumentException("Client with ID " + client.getId() + " not found");
         }
         
         // Check if DNI is being changed and if new DNI already exists
-        if (!existingClient.getDni().equals(client.getDni()) && clientDAO.existsByDni(client.getDni())) {
+        if (!existingClient.getDni().equals(client.getDni()) && partyRepository.existsClientByDni(client.getDni())) {
             throw new IllegalArgumentException("Client with DNI " + client.getDni() + " already exists");
         }
         
@@ -111,10 +126,17 @@ public class ClientService {
             throw new IllegalArgumentException("Invalid DNI: letter does not match number");
         }
         
-        // Validate postal code matches province
-        if (client.getPostalCode() != null && client.getProvince() != null) {
-            if (!SpanishValidationUtil.isValidPostalCodeForProvince(client.getPostalCode(), client.getProvince())) {
-                throw new IllegalArgumentException("Postal code does not match the selected province");
+        // Validate postal code and infer/verify province
+        if (client.getPostalCode() != null) {
+            SpanishProvince inferred = SpanishProvince.getByPostalCode(client.getPostalCode());
+            if (inferred == null) {
+                throw new IllegalArgumentException("Postal code is invalid or does not match any province");
+            }
+            if (client.getProvince() == null) {
+                client.setProvince(inferred);
+            } else if (!inferred.equals(client.getProvince())) {
+                logger.warning(() -> "Postal code disagrees with provided province; overriding with " + inferred);
+                client.setProvince(inferred);
             }
         }
         
@@ -122,7 +144,7 @@ public class ClientService {
         client.setDni(SpanishValidationUtil.formatDNI(client.getDni()));
         
         logger.info(() -> "Updating client: " + client.getName());
-        return clientDAO.update(client);
+        return tx.runInTransaction(() -> partyRepository.updateClient(client));
     }
     
     /**
@@ -130,14 +152,14 @@ public class ClientService {
      * @param id Client ID to delete
      * @throws IllegalArgumentException if client not found
      */
-    public void deleteClient(Integer id) {
-        Client client = clientDAO.findById(id);
+    public void deleteClient(Long id) {
+        Client client = partyRepository.findClientById(id);
         if (client == null) {
             throw new IllegalArgumentException("Client with ID " + id + " not found");
         }
         
         logger.info(() -> "Deleting client: " + client.getName());
-        clientDAO.delete(client);
+        tx.runInTransaction(() -> partyRepository.deleteClient(client));
     }
     
     /**
@@ -145,8 +167,8 @@ public class ClientService {
      * @param id Client ID
      * @return Client or null if not found
      */
-    public Client findClientById(Integer id) {
-        return clientDAO.findById(id);
+    public Client findClientById(Long id) {
+        return tx.runInTransaction(() -> partyRepository.findClientById(id));
     }
     
     /**
@@ -155,7 +177,7 @@ public class ClientService {
      * @return Client or null if not found
      */
     public Client findClientByDni(String dni) {
-        return clientDAO.findByDni(dni);
+        return tx.runInTransaction(() -> partyRepository.findClientByDni(dni));
     }
     
     /**
@@ -163,15 +185,15 @@ public class ClientService {
      * @return List of all clients
      */
     public List<Client> getAllClients() {
-        return clientDAO.findAll();
+        return tx.runInTransaction(() -> partyRepository.findAllClients());
     }
     
     /**
-     * Gets all clients ordered by ID
-     * @return List of clients ordered by ID
+     * Gets all clients ordered by CODE
+     * @return List of clients ordered by CODE
      */
-    public List<Client> getAllClientsOrderedById() {
-        return clientDAO.findAllOrderedById();
+    public List<Client> getAllClientsOrderedByCode() {
+        return tx.runInTransaction(() -> partyRepository.findAllClientsOrderedByCode());
     }
     
     /**
@@ -179,7 +201,7 @@ public class ClientService {
      * @return List of clients ordered by DNI
      */
     public List<Client> getAllClientsOrderedByDni() {
-        return clientDAO.findAllOrderedByDni();
+        return tx.runInTransaction(() -> partyRepository.findAllClientsOrderedByDni());
     }
     
     /**
@@ -187,7 +209,7 @@ public class ClientService {
      * @return List of clients ordered by name
      */
     public List<Client> getAllClientsOrderedByName() {
-        return clientDAO.findAllOrderedByName();
+        return tx.runInTransaction(() -> partyRepository.findAllClientsOrderedByName());
     }
     
     /**
@@ -199,7 +221,7 @@ public class ClientService {
         if (searchTerm == null || searchTerm.trim().isEmpty()) {
             return getAllClients();
         }
-        return clientDAO.searchClients(searchTerm.trim());
+        return tx.runInTransaction(() -> partyRepository.searchClients(searchTerm.trim()));
     }
     
     /**
@@ -207,7 +229,7 @@ public class ClientService {
      * @return List of active clients
      */
     public List<Client> getActiveClients() {
-        return clientDAO.findActiveClients();
+        return tx.runInTransaction(() -> partyRepository.findActiveClients());
     }
     
     /**
@@ -215,7 +237,7 @@ public class ClientService {
      * @return List of inactive clients
      */
     public List<Client> getInactiveClients() {
-        return clientDAO.findInactiveClients();
+        return tx.runInTransaction(() -> partyRepository.findInactiveClients());
     }
     
     /**
@@ -223,7 +245,7 @@ public class ClientService {
      * @param id Client ID to activate
      * @return Updated client
      */
-    public Client activateClient(Integer id) {
+    public Client activateClient(Long id) {
         Client client = findClientById(id);
         if (client == null) {
             throw new IllegalArgumentException("Client with ID " + id + " not found");
@@ -238,7 +260,7 @@ public class ClientService {
      * @param id Client ID to deactivate
      * @return Updated client
      */
-    public Client deactivateClient(Integer id) {
+    public Client deactivateClient(Long id) {
         Client client = findClientById(id);
         if (client == null) {
             throw new IllegalArgumentException("Client with ID " + id + " not found");
@@ -253,7 +275,30 @@ public class ClientService {
      * @return Total count
      */
     public long getTotalClientCount() {
-        return clientDAO.count();
+        return tx.runInTransaction(() -> partyRepository.countClients());
+    }
+
+    public ImportResult importClients(List<ClientImportDTO> input) {
+        if (input == null) return new ImportResult(0, 0, 0);
+        return tx.runInTransaction(() -> {
+            int imported = 0;
+            int skipped = 0;
+            int failed = 0;
+            for (ClientImportDTO dto : input) {
+                try {
+                    Client client = mapFromDto(dto);
+                    if (client.getDni() != null && partyRepository.existsClientByDni(client.getDni())) {
+                        skipped++;
+                        continue;
+                    }
+                    createClient(client);
+                    imported++;
+                } catch (Exception e) {
+                    failed++;
+                }
+            }
+            return new ImportResult(imported, skipped, failed);
+        });
     }
     
     /**
@@ -280,5 +325,38 @@ public class ClientService {
      */
     public SpanishProvince getProvinceByPostalCode(String postalCode) {
         return SpanishProvince.getByPostalCode(postalCode);
+    }
+
+    private Client mapFromDto(ClientImportDTO dto) {
+        if (dto == null) throw new IllegalArgumentException("Client data cannot be null");
+        Client c = new Client();
+        c.setDni(dto.dni);
+        c.setName(dto.name);
+        c.setAddress(dto.address);
+        c.setEmail(dto.email);
+        c.setCity(dto.city);
+        if (dto.province != null) {
+            try {
+                c.setProvince(SpanishProvince.valueOf(dto.province));
+            } catch (IllegalArgumentException ignored) {
+                // validation will handle invalid province
+            }
+        }
+        c.setPostalCode(dto.postalCode);
+        c.setFixedPhone(dto.fixedPhone);
+        c.setMobilePhone(dto.mobilePhone);
+        c.setWebsite(dto.website);
+        if (dto.paymentMethod != null) {
+            try {
+                c.setPaymentMethod(com.billing.model.PaymentMethod.valueOf(dto.paymentMethod));
+            } catch (IllegalArgumentException ignored) {
+                // validation will handle invalid payment method
+            }
+        }
+        c.setCreditLimit(dto.creditLimit);
+        c.setBankAccountNumber(dto.bankAccountNumber);
+        c.setActive(dto.active);
+        c.setObservations(dto.observations);
+        return c;
     }
 }
