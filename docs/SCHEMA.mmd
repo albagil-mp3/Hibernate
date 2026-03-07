@@ -1,37 +1,89 @@
-%%{init: { 'theme': 'base', 'themeVariables': { 'primaryColor': '#7B1FA2', 'edgeLabelBackground':'#ffffff' }}}%%
 erDiagram
+    PARTY {
+        BIGINT id PK
+        string name
+        string email
+        string city
+        string province
+    }
+
     CLIENT {
-        INT id PK
-        string code
-        string name
+        BIGINT id PK,FK
         string dni
-        string address
-    }
-    ITEM {
-        INT id PK
         string code
+        string payment_method
+        boolean active
+    }
+
+    SUPPLIER {
+        BIGINT id PK,FK
+        string tax_id
+        string code
+        boolean active
+    }
+
+    ITEM_FAMILIES {
+        string code PK
         string name
-        decimal price
     }
-    DELIVERY_NOTE {
-        INT id PK
+
+    ITEM_CATEGORIES {
+        string code PK
+        string name
+    }
+
+    UNITS {
+        string symbol PK
+        string name
+    }
+
+    ITEM {
+        BIGINT id PK
         string code
-        datetime created_at
+        string description
+        decimal cost_price
+        decimal sale_price
+        decimal iva_percent
+        int current_stock
+        int minimum_stock
     }
-    DELIVERY_LINE {
-        INT id PK
-        INT quantity
-        decimal unit_price
-    }
-    INVOICE {
-        INT id PK
+
+    BUSINESS_DOCUMENT {
+        BIGINT id PK
+        date doc_date
         string code
-        datetime created_at
+        decimal subtotal
+        decimal taxes
         decimal total
     }
 
-    CLIENT ||--o{ DELIVERY_NOTE : has
-    CLIENT ||--o{ INVOICE : billed
-    DELIVERY_NOTE ||--o{ DELIVERY_LINE : contains
-    INVOICE ||--o{ DELIVERY_LINE : contains
-    ITEM ||--o{ DELIVERY_LINE : referenced
+    DELIVERY_NOTE {
+        BIGINT id PK,FK
+        boolean delivered
+        boolean invoiced
+    }
+
+    INVOICE {
+        BIGINT id PK,FK
+    }
+
+    DOCUMENT_LINE {
+        BIGINT id PK
+        decimal quantity
+        decimal unit_price
+        decimal tax_rate
+    }
+
+    PARTY ||--|| CLIENT : inherits
+    PARTY ||--|| SUPPLIER : inherits
+
+    PARTY ||--o{ BUSINESS_DOCUMENT : owns
+    BUSINESS_DOCUMENT ||--|| DELIVERY_NOTE : inherits
+    BUSINESS_DOCUMENT ||--|| INVOICE : inherits
+    BUSINESS_DOCUMENT ||--o{ DOCUMENT_LINE : contains
+
+    ITEM ||--o{ DOCUMENT_LINE : referenced
+    SUPPLIER ||--o{ ITEM : supplies
+    ITEM_FAMILIES ||--o{ ITEM : groups
+    ITEM_CATEGORIES ||--o{ ITEM : classifies
+    UNITS ||--o{ ITEM : measured_as
